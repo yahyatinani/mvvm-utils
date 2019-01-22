@@ -252,8 +252,6 @@ namespace UnitTests
         {
             CheckReentrancy();
 
-            if ( range == null ) throw new NullRange();
-
             var toAddItems = ToList( range );
 
             if ( IsEmpty( toAddItems ) ) return;
@@ -262,9 +260,19 @@ namespace UnitTests
 
             foreach ( var item in toAddItems ) Items.Add( item );
 
-            OnPropertyChanged( new PropertyChangedEventArgs( nameof( Count ) ) );
-            OnPropertyChanged( new PropertyChangedEventArgs( nameof( Items ) ) );
-            OnCollectionChanged( eventArgs );
+            RaiseEvents( eventArgs );
+        }
+
+        private static List<T> ToList( IEnumerable<T> range )
+        {
+            if ( range == null ) throw new NullRange();
+
+            return range is List<T> list ? list : new List<T>( range );
+        }
+
+        private static bool IsEmpty( ICollection toAddItems )
+        {
+            return toAddItems.Count == 0;
         }
 
         private bool IsEmpty()
@@ -283,14 +291,11 @@ namespace UnitTests
                 Count );
         }
 
-        private static bool IsEmpty( ICollection toAddItems )
+        private void RaiseEvents( NotifyCollectionChangedEventArgs eventArgs )
         {
-            return toAddItems.Count == 0;
-        }
-
-        private static List<T> ToList( IEnumerable<T> range )
-        {
-            return range is List<T> list ? list : new List<T>( range );
+            OnPropertyChanged( new PropertyChangedEventArgs( nameof( Count ) ) );
+            OnPropertyChanged( new PropertyChangedEventArgs( nameof( Items ) ) );
+            OnCollectionChanged( eventArgs );
         }
 
         public class NullRange : Exception
