@@ -9,6 +9,16 @@ namespace ObservableRangeCollection
 {
     public abstract class ObservableRangeCollectionBase<T> : ObservableCollection<T>
     {
+        public void ReplaceRange( IEnumerable<T> range )
+        {
+            CheckReentrancy();
+
+            var toAddItems = ToList( range );
+            Items.Clear();
+
+            AddAndRaiseEvents( toAddItems );
+        }
+
         public void AddRange( IEnumerable<T> range )
         {
             CheckReentrancy();
@@ -22,9 +32,13 @@ namespace ObservableRangeCollection
 
         private static List<T> ToList( IEnumerable<T> range )
         {
-            if ( range == null ) throw new ObservableRangeCollection<T>.NullRange();
+            if ( range == null ) throw new NullRange();
 
             return range is List<T> list ? list : new List<T>( range );
+        }
+
+        public class NullRange : Exception
+        {
         }
     }
 
@@ -67,10 +81,6 @@ namespace ObservableRangeCollection
             OnPropertyChanged( new PropertyChangedEventArgs( nameof( Count ) ) );
             OnPropertyChanged( new PropertyChangedEventArgs( nameof( Items ) ) );
             OnCollectionChanged( eventArgs );
-        }
-
-        public class NullRange : Exception
-        {
         }
     }
 }

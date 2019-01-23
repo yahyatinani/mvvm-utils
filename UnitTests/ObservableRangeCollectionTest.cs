@@ -8,7 +8,7 @@ using NUnit.Framework;
 using ObservableRangeCollection;
 using static System.Collections.Specialized.NotifyCollectionChangedAction;
 using static NUnit.Framework.Assert;
-using static ObservableRangeCollection.ObservableRangeCollection<UnitTests.TestEntity>;
+using static ObservableRangeCollection.ObservableRangeCollectionBase<UnitTests.TestEntity>;
 
 namespace UnitTests
 {
@@ -99,6 +99,38 @@ namespace UnitTests
                 AssertCollectionSizeIs( 3 );
                 foreach ( var entity in one ) AssertCollectionContains( entity );
                 foreach ( var entity in two ) AssertCollectionContains( entity );
+            }
+
+            [Test]
+            public void WhenRangeIsNull_ReplaceRangeShouldThrowNullRangeWithoutChangingCollection()
+            {
+                var oldRange = new TestEntity();
+                AddRange( oldRange );
+
+                Throws<NullRange>( () => _collection.ReplaceRange( null ) );
+                AssertCollectionSizeIs( 1 );
+            }
+
+            [Test]
+            public void WhenReplacingRangeOneWithTwo_ShouldClearRangeOne()
+            {
+                var rangeOne = new TestEntity();
+                var rangeTwo = new List<TestEntity> { new TestEntity(), new TestEntity() };
+                AddRange( rangeOne );
+
+                _collection.ReplaceRange( rangeTwo );
+
+                False( _collection.Contains( rangeOne ) );
+            }
+
+            [Test]
+            public void ReplaceRangeShouldCall_AddAndRaiseEvents()
+            {
+                var stubCollection = new ObservableRangeCollectionBaseStub();
+
+                stubCollection.ReplaceRange( new[] { new TestEntity() } );
+
+                True( stubCollection.IsAddAndRaiseEventsCalled );
             }
         }
 
@@ -219,6 +251,23 @@ namespace UnitTests
                         _collection.CollectionChanged -= OnCollectionChanged;
 
                         Throws<InvalidOperationException>( () => AddRange( new TestEntity() ) );
+                    }
+                }
+
+                [Test]
+                public void WhenCollectionChangedHasMultiSubsAndIsBeingModified_ReplaceRangeThrowsInvalidOperation()
+                {
+                    _collection.CollectionChanged += OnCollectionChanged;
+                    _collection.CollectionChanged += ( sender, args ) => { };
+
+                    _collection.ReplaceRange( new[] { new TestEntity(), new TestEntity(), new TestEntity() } );
+
+                    void OnCollectionChanged( object sender, NotifyCollectionChangedEventArgs args )
+                    {
+                        _collection.CollectionChanged -= OnCollectionChanged;
+
+                        Throws<InvalidOperationException>(
+                            () => _collection.ReplaceRange( new[] { new TestEntity() } ) );
                     }
                 }
             }
