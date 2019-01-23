@@ -36,6 +36,11 @@ namespace UnitTests
         {
             _collection.AddRange( range );
         }
+        
+        private void ReplaceRange( params TestEntity[] range )
+        {
+            _collection.ReplaceRange( range );
+        }
 
         [TestFixture]
         public class ObservableRangeCollectionTest : ObservableRangeCollectionContext
@@ -107,7 +112,7 @@ namespace UnitTests
                 var oldRange = new TestEntity();
                 AddRange( oldRange );
 
-                Throws<NullRange>( () => _collection.ReplaceRange( null ) );
+                Throws<NullRange>( () => ReplaceRange( null ) );
                 AssertCollectionSizeIs( 1 );
             }
 
@@ -115,10 +120,9 @@ namespace UnitTests
             public void WhenReplacingRangeOneWithTwo_ShouldClearRangeOne()
             {
                 var rangeOne = new TestEntity();
-                var rangeTwo = new List<TestEntity> { new TestEntity(), new TestEntity() };
                 AddRange( rangeOne );
-
-                _collection.ReplaceRange( rangeTwo );
+                
+                ReplaceRange( new TestEntity(), new TestEntity() );
 
                 False( _collection.Contains( rangeOne ) );
             }
@@ -259,15 +263,15 @@ namespace UnitTests
                 {
                     _collection.CollectionChanged += OnCollectionChanged;
                     _collection.CollectionChanged += ( sender, args ) => { };
-
-                    _collection.ReplaceRange( new[] { new TestEntity(), new TestEntity(), new TestEntity() } );
+                    
+                    ReplaceRange( new TestEntity(), new TestEntity(), new TestEntity() );
 
                     void OnCollectionChanged( object sender, NotifyCollectionChangedEventArgs args )
                     {
                         _collection.CollectionChanged -= OnCollectionChanged;
 
                         Throws<InvalidOperationException>(
-                            () => _collection.ReplaceRange( new[] { new TestEntity() } ) );
+                            () => ReplaceRange( new TestEntity() ) );
                     }
                 }
             }
