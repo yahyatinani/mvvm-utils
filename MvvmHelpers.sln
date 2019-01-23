@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{869B7EA9-158D-40BB-B9B6-C4E405AA61A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObservableRangeCollection", "ObservableRangeCollection\ObservableRangeCollection.csproj", "{D34B8762-98AC-4B08-9915-AC87F933463C}"
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -17,6 +19,10 @@ Global
 		{869B7EA9-158D-40BB-B9B6-C4E405AA61A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{869B7EA9-158D-40BB-B9B6-C4E405AA61A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{869B7EA9-158D-40BB-B9B6-C4E405AA61A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D34B8762-98AC-4B08-9915-AC87F933463C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D34B8762-98AC-4B08-9915-AC87F933463C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D34B8762-98AC-4B08-9915-AC87F933463C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D34B8762-98AC-4B08-9915-AC87F933463C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
