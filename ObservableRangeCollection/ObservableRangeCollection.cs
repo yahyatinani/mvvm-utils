@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace ObservableRangeCollection
 {
-    public class ObservableRangeCollection<T> : ObservableCollection<T>
+    public abstract class ObservableRangeCollectionBase<T> : ObservableCollection<T>
     {
         public void AddRange( IEnumerable<T> range )
         {
@@ -15,6 +15,23 @@ namespace ObservableRangeCollection
 
             var toAddItems = ToList( range );
 
+            AddAndRaiseEvents( toAddItems );
+        }
+
+        protected abstract void AddAndRaiseEvents( List<T> toAddItems );
+
+        private static List<T> ToList( IEnumerable<T> range )
+        {
+            if ( range == null ) throw new ObservableRangeCollection<T>.NullRange();
+
+            return range is List<T> list ? list : new List<T>( range );
+        }
+    }
+
+    public class ObservableRangeCollection<T> : ObservableRangeCollectionBase<T>
+    {
+        protected override void AddAndRaiseEvents( List<T> toAddItems )
+        {
             if ( IsEmpty( toAddItems ) ) return;
 
             var eventArgs = IsEmpty() ? ResetEventArgs() : ActionEventArgs( toAddItems );
@@ -22,13 +39,6 @@ namespace ObservableRangeCollection
             foreach ( var item in toAddItems ) Items.Add( item );
 
             RaiseEvents( eventArgs );
-        }
-
-        private static List<T> ToList( IEnumerable<T> range )
-        {
-            if ( range == null ) throw new NullRange();
-
-            return range is List<T> list ? list : new List<T>( range );
         }
 
         private static bool IsEmpty( ICollection toAddItems )

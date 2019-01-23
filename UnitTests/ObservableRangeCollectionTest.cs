@@ -14,17 +14,22 @@ namespace UnitTests
 {
     public abstract class ObservableRangeCollectionContext
     {
-        private ObservableRangeCollection<TestEntity> _collection;
+        private ObservableRangeCollectionMock<TestEntity> _collection;
 
         [SetUp]
         public void ObservableRangeCollectionContextSetup()
         {
-            _collection = new ObservableRangeCollection<TestEntity>();
+            _collection = new ObservableRangeCollectionMock<TestEntity>();
         }
 
         private void AssertCollectionSizeIs( int expectedSize )
         {
             AreEqual( expectedSize, _collection.Count );
+        }
+
+        private void AddAndRaiseEvents( params TestEntity[] range )
+        {
+            _collection.AddAndRaiseEvents( new List<TestEntity>( range ) );
         }
 
         private void AddRange( params TestEntity[] range )
@@ -55,9 +60,19 @@ namespace UnitTests
             }
 
             [Test]
+            public void AddRangeShouldCall_AddAndRaiseEvents()
+            {
+                var stubCollection = new ObservableRangeCollectionBaseStub();
+
+                stubCollection.AddRange( new[] { new TestEntity() } );
+
+                True( stubCollection.IsAddAndRaiseEventsCalled );
+            }
+
+            [Test]
             public void WhenAddingEmptyRange_CollectionShouldNotChange()
             {
-                AddRange();
+                AddAndRaiseEvents();
 
                 AssertCollectionSizeIs( 0 );
             }
@@ -67,7 +82,7 @@ namespace UnitTests
             {
                 var one = new[] { new TestEntity() };
 
-                AddRange( one );
+                AddAndRaiseEvents( one );
 
                 foreach ( var entity in one ) AssertCollectionContains( entity );
             }
@@ -78,8 +93,8 @@ namespace UnitTests
                 var one = new[] { new TestEntity() };
                 var two = new[] { new TestEntity(), new TestEntity() };
 
-                AddRange( one );
-                AddRange( two );
+                AddAndRaiseEvents( one );
+                AddAndRaiseEvents( two );
 
                 AssertCollectionSizeIs( 3 );
                 foreach ( var entity in one ) AssertCollectionContains( entity );
@@ -142,7 +157,7 @@ namespace UnitTests
                 {
                     var one = new[] { new TestEntity() };
 
-                    AddRange( one );
+                    AddAndRaiseEvents( one );
 
                     AssertAnEventRaised();
                     AssertCollectionChangedEventActionIs( Reset );
@@ -152,10 +167,10 @@ namespace UnitTests
                 [Test]
                 public void WhenAddingRangeOneToNonEmptyCollection_ShouldRaiseCollectionChangedWithAddAction()
                 {
-                    AddRange( new TestEntity(), new TestEntity() );
+                    AddAndRaiseEvents( new TestEntity(), new TestEntity() );
                     var one = new[] { new TestEntity() };
 
-                    AddRange( one );
+                    AddAndRaiseEvents( one );
 
                     AssertAnEventRaised();
                     AssertCollectionChangedEventActionIs( Add );
@@ -169,7 +184,7 @@ namespace UnitTests
                 [Test]
                 public void WhenAddingEmptyRange_NoEventsShouldBeRaised()
                 {
-                    AddRange();
+                    AddAndRaiseEvents();
 
                     AssertNoEventRaised();
                 }
@@ -185,7 +200,7 @@ namespace UnitTests
                         _eventNotifier.Set();
                     };
 
-                    AddRange( new TestEntity(), new TestEntity(), new TestEntity() );
+                    AddAndRaiseEvents( new TestEntity(), new TestEntity(), new TestEntity() );
 
                     AssertAnEventRaised();
                     AreEqual( 1, eventRaisesCount );
@@ -227,7 +242,7 @@ namespace UnitTests
                 [Test]
                 public void WhenAddingRange_ShouldRaisePropertyChanged()
                 {
-                    AddRange( new TestEntity() );
+                    AddAndRaiseEvents( new TestEntity() );
 
                     AssertAnEventRaised();
                     AreEqual( 2, _propertiesNames.Count );
@@ -238,11 +253,29 @@ namespace UnitTests
                 [Test]
                 public void WhenAddingEmptyRange_NoEventsShouldBeRaised()
                 {
-                    AddRange();
+                    AddAndRaiseEvents();
 
                     AssertNoEventRaised();
                 }
             }
+        }
+
+        private class ObservableRangeCollectionBaseStub : ObservableRangeCollectionBase<TestEntity>
+        {
+            protected override void AddAndRaiseEvents( List<TestEntity> toAddItems )
+            {
+                IsAddAndRaiseEventsCalled = true;
+            }
+
+            public bool IsAddAndRaiseEventsCalled { get; private set; }
+        }
+    }
+
+    internal class ObservableRangeCollectionMock<T> : ObservableRangeCollection<T>
+    {
+        public new void AddAndRaiseEvents( List<T> toAddItems )
+        {
+            base.AddAndRaiseEvents( toAddItems );
         }
     }
 }
