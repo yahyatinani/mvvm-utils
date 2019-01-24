@@ -14,8 +14,8 @@ namespace ObservableRangeCollection
             CheckReentrancy();
 
             var toAddItems = ToList( range );
+            
             Items.Clear();
-
             AddAndRaiseEvents( toAddItems );
         }
 
