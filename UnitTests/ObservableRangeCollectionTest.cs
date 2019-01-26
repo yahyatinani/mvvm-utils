@@ -14,12 +14,12 @@ namespace UnitTests
 {
     public abstract class ObservableRangeCollectionContext
     {
-        private ObservableRangeCollectionMock<TestEntity> _collection;
+        private ObservableRangeCollection<TestEntity> _collection;
 
         [SetUp]
         public void ObservableRangeCollectionContextSetup()
         {
-            _collection = new ObservableRangeCollectionMock<TestEntity>();
+            _collection = new ObservableRangeCollection<TestEntity>();
         }
 
         private void AssertCollectionSizeIs( int expectedSize )
@@ -318,13 +318,13 @@ namespace UnitTests
             }
         }
 
-        private class ObservableRangeCollectionBaseStub : ObservableRangeCollectionBase<TestEntity>
+        private class ObservableRangeCollectionBaseStub : ObservableRangeCollection<TestEntity>
         {
             public List<TestEntity> ToAddItems { get; private set; }
 
             public int CountMock { get; private set; } = -1;
 
-            protected override void AddAndRaiseEvents( List<TestEntity> toAddItems )
+            protected internal override void AddAndRaiseEvents( List<TestEntity> toAddItems )
             {
                 CountMock = Count;
                 ToAddItems = toAddItems;
@@ -332,14 +332,6 @@ namespace UnitTests
             }
 
             public bool IsAddAndRaiseEventsCalled { get; private set; }
-        }
-    }
-
-    internal class ObservableRangeCollectionMock<T> : ObservableRangeCollection<T>
-    {
-        public new void AddAndRaiseEvents( List<T> toAddItems )
-        {
-            base.AddAndRaiseEvents( toAddItems );
         }
     }
 }

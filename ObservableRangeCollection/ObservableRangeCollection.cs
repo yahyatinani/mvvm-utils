@@ -17,7 +17,7 @@ namespace ObservableRangeCollection
             CheckReentrancy();
 
             var toAddItems = ToList( range );
-            
+
             Items.Clear();
             AddAndRaiseEvents( toAddItems );
         }
@@ -31,7 +31,7 @@ namespace ObservableRangeCollection
             AddAndRaiseEvents( toAddItems );
         }
 
-        protected abstract void AddAndRaiseEvents( List<T> toAddItems );
+        protected internal abstract void AddAndRaiseEvents( List<T> toAddItems );
 
         private static List<T> ToList( IEnumerable<T> range )
         {
@@ -47,7 +47,7 @@ namespace ObservableRangeCollection
 
     public class ObservableRangeCollection<T> : ObservableRangeCollectionBase<T>
     {
-        protected override void AddAndRaiseEvents( List<T> toAddItems )
+        protected internal override void AddAndRaiseEvents( List<T> toAddItems )
         {
             if ( IsEmpty( toAddItems ) ) return;
 
