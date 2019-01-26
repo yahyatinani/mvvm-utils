@@ -130,7 +130,7 @@ namespace UnitTests
                 _collection.Add( oldRange );
 
                 Throws<NullRange>( () => ReplaceRange( null ) );
-                AssertCollectionSizeIs( 1 );
+                AreEqual( oldRange, _collection[0] );
             }
 
             [Test]
@@ -143,6 +143,28 @@ namespace UnitTests
 
                 True( stubCollection.IsReplaceItemsCalled );
                 AreEqual( testEntities, stubCollection.ToAddItems );
+            }
+
+            [Test]
+            public void WhenItemIsNull_ReplaceThrowNullItem()
+            {
+                var oldRange = new TestEntity();
+                _collection.Add( oldRange );
+
+                Throws<NullItem>( () => _collection.Replace( null ) );
+                AreEqual( oldRange, _collection[0] );
+            }
+
+            [Test]
+            public void ReplaceShouldCallReplaceItems()
+            {
+                var item = new TestEntity();
+                var stubCollection = new ObservableRangeCollectionBaseStub();
+
+                stubCollection.Replace( item );
+
+                True( stubCollection.IsReplaceItemsCalled );
+                AreEqual( item, stubCollection.ReplacedItem );
             }
         }
 
@@ -278,8 +300,23 @@ namespace UnitTests
                     {
                         _collection.CollectionChanged -= OnCollectionChanged;
 
-                        Throws<InvalidOperationException>(
-                            () => ReplaceRange( new TestEntity() ) );
+                        Throws<InvalidOperationException>( () => ReplaceRange( new TestEntity() ) );
+                    }
+                }
+
+                [Test]
+                public void WhenCollectionChangedHasMultiSubsAndIsBeingModified_ReplaceThrowsInvalidOperation()
+                {
+                    _collection.CollectionChanged += OnCollectionChanged;
+                    _collection.CollectionChanged += ( sender, args ) => { };
+
+                    _collection.Replace( new TestEntity() );
+
+                    void OnCollectionChanged( object sender, NotifyCollectionChangedEventArgs args )
+                    {
+                        _collection.CollectionChanged -= OnCollectionChanged;
+
+                        Throws<InvalidOperationException>( () => _collection.Replace( new TestEntity() ) );
                     }
                 }
             }
@@ -334,15 +371,18 @@ namespace UnitTests
                 IsAddAndRaiseEventsCalled = true;
             }
 
-            protected internal override void ReplaceItems( List<TestEntity> toAddItems )
+            protected internal override void ReplaceItems( List<TestEntity> items )
             {
-                base.ReplaceItems( toAddItems );
+                base.ReplaceItems( items );
                 IsReplaceItemsCalled = true;
+                ReplacedItem = items[0];
             }
 
             public bool IsAddAndRaiseEventsCalled { get; private set; }
 
             public bool IsReplaceItemsCalled { get; private set; }
+
+            public TestEntity ReplacedItem { get; private set; }
         }
     }
 }
