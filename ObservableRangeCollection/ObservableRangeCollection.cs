@@ -16,22 +16,15 @@ namespace ObservableRangeCollection
         {
             CheckReentrancy();
 
-            var toAddItems = ToList( range );
-
-            Items.Clear();
-            AddAndRaiseEvents( toAddItems );
+            ReplaceItems( ToList( range ) );
         }
 
         public void AddRange( IEnumerable<T> range )
         {
             CheckReentrancy();
 
-            var toAddItems = ToList( range );
-
-            AddAndRaiseEvents( toAddItems );
+            AddAndRaiseEvents( ToList( range ) );
         }
-
-        protected internal abstract void AddAndRaiseEvents( List<T> toAddItems );
 
         private static List<T> ToList( IEnumerable<T> range )
         {
@@ -40,6 +33,10 @@ namespace ObservableRangeCollection
             return range is List<T> list ? list : new List<T>( range );
         }
 
+        protected internal abstract void ReplaceItems( List<T> toAddItems );
+
+        protected internal abstract void AddAndRaiseEvents( List<T> toAddItems );
+
         public class NullRange : Exception
         {
         }
@@ -47,11 +44,17 @@ namespace ObservableRangeCollection
 
     public class ObservableRangeCollection<T> : ObservableRangeCollectionBase<T>
     {
+        protected internal override void ReplaceItems( List<T> toAddItems )
+        {
+            Items.Clear();
+            AddAndRaiseEvents( toAddItems );
+        }
+
         protected internal override void AddAndRaiseEvents( List<T> toAddItems )
         {
             if ( IsEmpty( toAddItems ) ) return;
 
-            var eventArgs = IsEmpty() ? ResetEventArgs() : ActionEventArgs( toAddItems );
+            var eventArgs = IsEmpty() ? ResetEventArgs() : AddEventArgs( toAddItems );
 
             foreach ( var item in toAddItems ) Items.Add( item );
 
@@ -73,7 +76,7 @@ namespace ObservableRangeCollection
             return new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset );
         }
 
-        private NotifyCollectionChangedEventArgs ActionEventArgs( IList toAddItems )
+        private NotifyCollectionChangedEventArgs AddEventArgs( IList toAddItems )
         {
             return new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Add, toAddItems,
                 Count );

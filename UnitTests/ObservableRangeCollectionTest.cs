@@ -109,6 +109,21 @@ namespace UnitTests
             }
 
             [Test]
+            public void ReplaceItemsShouldClearRangeOneAndCallAddAndRaiseEventsToAddRangeTwo()
+            {
+                var rangeOne = new TestEntity();
+                var stubCollection = new ObservableRangeCollectionBaseStub { rangeOne };
+
+                var rangeTwo = new List<TestEntity> { new TestEntity(), new TestEntity() };
+                stubCollection.ReplaceItems( rangeTwo );
+
+                False( stubCollection.Contains( rangeOne ) );
+                True( stubCollection.IsAddAndRaiseEventsCalled );
+                AreEqual( rangeTwo, stubCollection.ToAddItems );
+                AreEqual( 0, stubCollection.CountMock, "Clear() got called before AddAndRaiseEvents()!" );
+            }
+
+            [Test]
             public void WhenRangeIsNull_ReplaceRangeShouldThrowNullRangeWithoutChangingCollection()
             {
                 var oldRange = new TestEntity();
@@ -119,27 +134,15 @@ namespace UnitTests
             }
 
             [Test]
-            public void WhenReplacingRangeOneWithTwo_ShouldClearRangeOne()
-            {
-                var rangeOne = new TestEntity();
-                AddRange( rangeOne );
-
-                ReplaceRange( new TestEntity(), new TestEntity() );
-
-                False( _collection.Contains( rangeOne ) );
-            }
-
-            [Test]
-            public void ReplaceRangeShouldCall_AddAndRaiseEvents()
+            public void ReplaceRangeShouldCallReplaceItems()
             {
                 var stubCollection = new ObservableRangeCollectionBaseStub { new TestEntity() };
 
-                var testEntities = new[] { new TestEntity() };
+                var testEntities = new List<TestEntity> { new TestEntity(), new TestEntity() };
                 stubCollection.ReplaceRange( testEntities );
 
-                True( stubCollection.IsAddAndRaiseEventsCalled );
+                True( stubCollection.IsReplaceItemsCalled );
                 AreEqual( testEntities, stubCollection.ToAddItems );
-                AreEqual( 0, stubCollection.CountMock, "Clear() got called before AddAndRaiseEvents()!" );
             }
         }
 
@@ -331,7 +334,15 @@ namespace UnitTests
                 IsAddAndRaiseEventsCalled = true;
             }
 
+            protected internal override void ReplaceItems( List<TestEntity> toAddItems )
+            {
+                base.ReplaceItems( toAddItems );
+                IsReplaceItemsCalled = true;
+            }
+
             public bool IsAddAndRaiseEventsCalled { get; private set; }
+
+            public bool IsReplaceItemsCalled { get; private set; }
         }
     }
 }
