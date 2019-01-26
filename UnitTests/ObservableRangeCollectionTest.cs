@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Threading;
@@ -45,6 +44,14 @@ namespace UnitTests
         [TestFixture]
         public class ObservableRangeCollectionTest : ObservableRangeCollectionContext
         {
+            private ObservableRangeCollectionSpy _collectionSpy;
+
+            [SetUp]
+            public void ObservableRangeCollectionTestSetUp()
+            {
+                _collectionSpy = new ObservableRangeCollectionSpy();
+            }
+
             private void AssertCollectionContains( TestEntity entity )
             {
                 if ( entity == null ) throw new ArgumentNullException( nameof( entity ) );
@@ -52,29 +59,7 @@ namespace UnitTests
                 True( _collection.Contains( entity ) );
             }
 
-            [Test]
-            public void ObservableRangeCollection_ShouldBeInstanceOfObservableCollection()
-            {
-                IsInstanceOf<ObservableCollection<TestEntity>>( _collection );
-            }
-
-            [Test]
-            public void WhenAddingNullRange_AddRangeThrowsNullRange()
-            {
-                Throws<NullRange>( () => AddRange( null ) );
-            }
-
-            [Test]
-            public void AddRangeShouldCall_AddAndRaiseEvents()
-            {
-                var stubCollection = new ObservableRangeCollectionBaseStub();
-
-                var testEntities = new[] { new TestEntity() };
-                stubCollection.AddRange( testEntities );
-
-                True( stubCollection.IsAddAndRaiseEventsCalled );
-                AreEqual( testEntities, stubCollection.ToAddItems );
-            }
+            #region AddAndRaiseEventsTests
 
             [Test]
             public void WhenAddingEmptyRange_CollectionShouldNotChange()
@@ -97,31 +82,56 @@ namespace UnitTests
             [Test]
             public void WhenRangeOneAndTwoAreAdded_CollectionShouldContainRangeOneAndTwo()
             {
-                var one = new[] { new TestEntity() };
-                var two = new[] { new TestEntity(), new TestEntity() };
+                var rangeOne = new[] { new TestEntity() };
+                var rangeTwo = new[] { new TestEntity(), new TestEntity() };
 
-                AddAndRaiseEvents( one );
-                AddAndRaiseEvents( two );
+                AddAndRaiseEvents( rangeOne );
+                AddAndRaiseEvents( rangeTwo );
 
                 AssertCollectionSizeIs( 3 );
-                foreach ( var entity in one ) AssertCollectionContains( entity );
-                foreach ( var entity in two ) AssertCollectionContains( entity );
+                foreach ( var entity in rangeOne ) AssertCollectionContains( entity );
+                foreach ( var entity in rangeTwo ) AssertCollectionContains( entity );
             }
+
+            #endregion
+
+            #region AddRangeTests
+
+            [Test]
+            public void WhenAddingNullRange_AddRangeThrowsNullRange()
+            {
+                Throws<NullRange>( () => AddRange( null ) );
+            }
+
+            [Test]
+            public void AddRangeShouldCall_AddAndRaiseEvents()
+            {
+                var testEntities = new[] { new TestEntity() };
+
+                _collectionSpy.AddRange( testEntities );
+
+                True( _collectionSpy.IsAddAndRaiseEventsCalled );
+                AreEqual( testEntities, _collectionSpy.ToAddItems );
+            }
+
+            #endregion
 
             [Test]
             public void ReplaceItemsShouldClearRangeOneAndCallAddAndRaiseEventsToAddRangeTwo()
             {
                 var rangeOne = new TestEntity();
-                var stubCollection = new ObservableRangeCollectionBaseStub { rangeOne };
-
                 var rangeTwo = new List<TestEntity> { new TestEntity(), new TestEntity() };
-                stubCollection.ReplaceItems( rangeTwo );
+                _collectionSpy.Add( rangeOne );
 
-                False( stubCollection.Contains( rangeOne ) );
-                True( stubCollection.IsAddAndRaiseEventsCalled );
-                AreEqual( rangeTwo, stubCollection.ToAddItems );
-                AreEqual( 0, stubCollection.CountMock, "Clear() got called before AddAndRaiseEvents()!" );
+                _collectionSpy.ReplaceItems( rangeTwo );
+
+                False( _collectionSpy.Contains( rangeOne ) );
+                True( _collectionSpy.IsAddAndRaiseEventsCalled );
+                AreEqual( rangeTwo, _collectionSpy.ToAddItems );
+                AreEqual( 0, _collectionSpy.CountMock, "Clear() got called before AddAndRaiseEvents()!" );
             }
+
+            #region ReplaceRangeTests
 
             [Test]
             public void WhenRangeIsNull_ReplaceRangeShouldThrowNullRangeWithoutChangingCollection()
@@ -136,14 +146,17 @@ namespace UnitTests
             [Test]
             public void ReplaceRangeShouldCallReplaceItems()
             {
-                var stubCollection = new ObservableRangeCollectionBaseStub { new TestEntity() };
-
                 var testEntities = new List<TestEntity> { new TestEntity(), new TestEntity() };
-                stubCollection.ReplaceRange( testEntities );
 
-                True( stubCollection.IsReplaceItemsCalled );
-                AreEqual( testEntities, stubCollection.ToAddItems );
+                _collectionSpy.ReplaceRange( testEntities );
+
+                True( _collectionSpy.IsReplaceItemsCalled );
+                AreEqual( testEntities, _collectionSpy.ToAddItems );
             }
+
+            #endregion
+
+            #region ReplaceTests
 
             [Test]
             public void WhenItemIsNull_ReplaceThrowNullItem()
@@ -159,12 +172,40 @@ namespace UnitTests
             public void ReplaceShouldCallReplaceItems()
             {
                 var item = new TestEntity();
-                var stubCollection = new ObservableRangeCollectionBaseStub();
 
-                stubCollection.Replace( item );
+                _collectionSpy.Replace( item );
 
-                True( stubCollection.IsReplaceItemsCalled );
-                AreEqual( item, stubCollection.ReplacedItem );
+                True( _collectionSpy.IsReplaceItemsCalled );
+                AreEqual( item, _collectionSpy.ReplacedItem );
+            }
+
+            #endregion
+
+            private class ObservableRangeCollectionSpy : ObservableRangeCollection<TestEntity>
+            {
+                public List<TestEntity> ToAddItems { get; private set; }
+
+                public int CountMock { get; private set; } = -1;
+
+                protected internal override void AddAndRaiseEvents( List<TestEntity> toAddItems )
+                {
+                    CountMock = Count;
+                    ToAddItems = toAddItems;
+                    IsAddAndRaiseEventsCalled = true;
+                }
+
+                protected internal override void ReplaceItems( List<TestEntity> items )
+                {
+                    base.ReplaceItems( items );
+                    IsReplaceItemsCalled = true;
+                    ReplacedItem = items[0];
+                }
+
+                public bool IsAddAndRaiseEventsCalled { get; private set; }
+
+                public bool IsReplaceItemsCalled { get; private set; }
+
+                public TestEntity ReplacedItem { get; private set; }
             }
         }
 
@@ -356,33 +397,6 @@ namespace UnitTests
                     AssertNoEventRaised();
                 }
             }
-        }
-
-        private class ObservableRangeCollectionBaseStub : ObservableRangeCollection<TestEntity>
-        {
-            public List<TestEntity> ToAddItems { get; private set; }
-
-            public int CountMock { get; private set; } = -1;
-
-            protected internal override void AddAndRaiseEvents( List<TestEntity> toAddItems )
-            {
-                CountMock = Count;
-                ToAddItems = toAddItems;
-                IsAddAndRaiseEventsCalled = true;
-            }
-
-            protected internal override void ReplaceItems( List<TestEntity> items )
-            {
-                base.ReplaceItems( items );
-                IsReplaceItemsCalled = true;
-                ReplacedItem = items[0];
-            }
-
-            public bool IsAddAndRaiseEventsCalled { get; private set; }
-
-            public bool IsReplaceItemsCalled { get; private set; }
-
-            public TestEntity ReplacedItem { get; private set; }
         }
     }
 }
