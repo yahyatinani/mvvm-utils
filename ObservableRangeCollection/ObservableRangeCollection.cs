@@ -62,18 +62,6 @@ namespace ObservableRangeCollection
             return toAddItems.Count == 0;
         }
 
-        protected internal abstract void ReplaceItems( List<T> items );
-
-        protected internal abstract void AddAndRaiseEvents( List<T> toAddItems );
-
-        public class NullRange : Exception
-        {
-        }
-
-        public class NullItem : Exception
-        {
-        }
-
         protected static NotifyCollectionChangedEventArgs ResetEventArgs()
         {
             return new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset );
@@ -84,6 +72,18 @@ namespace ObservableRangeCollection
             OnPropertyChanged( new PropertyChangedEventArgs( nameof( Count ) ) );
             OnPropertyChanged( new PropertyChangedEventArgs( nameof( Items ) ) );
             OnCollectionChanged( eventArgs );
+        }
+
+        protected internal abstract void ReplaceItems( List<T> items );
+
+        protected internal abstract void AddAndRaiseEvents( List<T> toAddItems );
+
+        public class NullRange : Exception
+        {
+        }
+
+        public class NullItem : Exception
+        {
         }
     }
 
