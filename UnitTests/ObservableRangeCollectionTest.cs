@@ -128,7 +128,7 @@ namespace UnitTests
                 False( _collectionSpy.Contains( rangeOne ) );
                 True( _collectionSpy.IsAddAndRaiseEventsCalled );
                 AreEqual( rangeTwo, _collectionSpy.ToAddItems );
-                AreEqual( 0, _collectionSpy.CountMock, "Clear() got called before AddAndRaiseEvents()!" );
+                AreEqual( 0, _collectionSpy.CountMock, "Clear() got called after AddAndRaiseEvents()!" );
             }
 
             #region ReplaceRangeTests
