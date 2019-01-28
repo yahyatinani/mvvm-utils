@@ -456,16 +456,13 @@ namespace UnitTests
                 public void ObservableRangeCollectionPropertyChangedEventSetup()
                 {
                     _propertiesNames = new List<string>();
-                    ( (INotifyPropertyChanged) _collection ).PropertyChanged += ( sender, args ) =>
-                    {
-                        if ( args != null ) _propertiesNames.Add( args.PropertyName );
-                        _eventNotifier.Set();
-                    };
                 }
 
                 [Test]
                 public void WhenAddingRange_ShouldRaisePropertyChanged()
                 {
+                    SubscribeToPropertyChangedEvent();
+
                     AddAndRaiseEvents( new TestEntity() );
 
                     AssertThatEventWasRaised();
@@ -477,9 +474,42 @@ namespace UnitTests
                 [Test]
                 public void WhenAddingEmptyRange_NoEventsShouldBeRaised()
                 {
+                    SubscribeToPropertyChangedEvent();
+
                     AddAndRaiseEvents();
 
                     AssertThatNoEventsWereRaised();
+                }
+
+                [Test]
+                public void RemoveRange_ShouldRaisePropertyChanged()
+                {
+                    var entity = new TestEntity();
+                    var toRemove = new[] { entity };
+                    AddRange( entity, new TestEntity(), new TestEntity() );
+                    SubscribeToPropertyChangedEvent();
+
+                    _collection.RemoveRange( toRemove );
+
+                    AssertThatEventWasRaised();
+                    AreEqual( 2, _propertiesNames.Count );
+                    
+                    AreEqual( "Count", _propertiesNames[0] );
+                    AreEqual( "Items", _propertiesNames[1] );
+                }
+
+                private void SubscribeToPropertyChangedEvent()
+                {
+                    ( (INotifyPropertyChanged) _collection ).PropertyChanged += OnPropertyChanged();
+
+                    PropertyChangedEventHandler OnPropertyChanged()
+                    {
+                        return ( sender, args ) =>
+                        {
+                            if ( args != null ) _propertiesNames.Add( args.PropertyName );
+                            _eventNotifier.Set();
+                        };
+                    }
                 }
             }
         }

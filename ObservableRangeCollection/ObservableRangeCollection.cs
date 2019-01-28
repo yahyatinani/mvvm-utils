@@ -47,7 +47,7 @@ namespace ObservableRangeCollection
 
             foreach ( var item in toRemoveRange ) Items.Remove( item );
 
-            OnCollectionChanged( ResetEventArgs() );
+            RaiseEvents( ResetEventArgs() );
         }
 
         private static List<T> ToList( IEnumerable<T> range )
