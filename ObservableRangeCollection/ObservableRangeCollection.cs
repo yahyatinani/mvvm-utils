@@ -40,11 +40,26 @@ namespace ObservableRangeCollection
             AddAndRaiseEvents( ToList( range ) );
         }
 
+        public void RemoveRange( IEnumerable<T> range )
+        {
+            var toRemoveRange = ToList( range );
+            if ( IsEmpty( toRemoveRange ) ) return;
+
+            foreach ( var item in toRemoveRange ) Items.Remove( item );
+
+            OnCollectionChanged( ResetEventArgs() );
+        }
+
         private static List<T> ToList( IEnumerable<T> range )
         {
             if ( range == null ) throw new NullRange();
 
             return range is List<T> list ? list : new List<T>( range );
+        }
+
+        protected static bool IsEmpty( ICollection toAddItems )
+        {
+            return toAddItems.Count == 0;
         }
 
         protected internal abstract void ReplaceItems( List<T> items );
@@ -57,6 +72,18 @@ namespace ObservableRangeCollection
 
         public class NullItem : Exception
         {
+        }
+
+        protected static NotifyCollectionChangedEventArgs ResetEventArgs()
+        {
+            return new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset );
+        }
+
+        protected void RaiseEvents( NotifyCollectionChangedEventArgs eventArgs )
+        {
+            OnPropertyChanged( new PropertyChangedEventArgs( nameof( Count ) ) );
+            OnPropertyChanged( new PropertyChangedEventArgs( nameof( Items ) ) );
+            OnCollectionChanged( eventArgs );
         }
     }
 
@@ -79,32 +106,16 @@ namespace ObservableRangeCollection
             RaiseEvents( eventArgs );
         }
 
-        private static bool IsEmpty( ICollection toAddItems )
-        {
-            return toAddItems.Count == 0;
-        }
-
         private bool IsEmpty()
         {
             return Count == 0;
         }
 
-        private static NotifyCollectionChangedEventArgs ResetEventArgs()
-        {
-            return new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Reset );
-        }
-
         private NotifyCollectionChangedEventArgs AddEventArgs( IList toAddItems )
         {
-            return new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Add, toAddItems,
-                Count );
-        }
+            const NotifyCollectionChangedAction addAction = NotifyCollectionChangedAction.Add;
 
-        private void RaiseEvents( NotifyCollectionChangedEventArgs eventArgs )
-        {
-            OnPropertyChanged( new PropertyChangedEventArgs( nameof( Count ) ) );
-            OnPropertyChanged( new PropertyChangedEventArgs( nameof( Items ) ) );
-            OnCollectionChanged( eventArgs );
+            return new NotifyCollectionChangedEventArgs( addAction, toAddItems, Count );
         }
     }
 }

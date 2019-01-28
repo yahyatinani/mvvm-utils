@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using ObservableRangeCollection;
@@ -19,11 +20,6 @@ namespace UnitTests
         public void ObservableRangeCollectionContextSetup()
         {
             _collection = new ObservableRangeCollection<TestEntity>();
-        }
-
-        private void AssertCollectionSizeIs( int expectedSize )
-        {
-            AreEqual( expectedSize, _collection.Count );
         }
 
         private void AddAndRaiseEvents( params TestEntity[] range )
@@ -66,7 +62,7 @@ namespace UnitTests
             {
                 AddAndRaiseEvents();
 
-                AssertCollectionSizeIs( 0 );
+                That( _collection, Is.Empty );
             }
 
             [Test]
@@ -88,7 +84,7 @@ namespace UnitTests
                 AddAndRaiseEvents( rangeOne );
                 AddAndRaiseEvents( rangeTwo );
 
-                AssertCollectionSizeIs( 3 );
+                That( _collection.Count, Is.EqualTo( 3 ) );
                 foreach ( var entity in rangeOne ) AssertCollectionContains( entity );
                 foreach ( var entity in rangeTwo ) AssertCollectionContains( entity );
             }
@@ -181,6 +177,39 @@ namespace UnitTests
 
             #endregion
 
+            #region RemoveRange
+
+            [Test]
+            public void WhenRemovingNullRange_RemoveRangeThrowsNullRange()
+            {
+                Throws<NullRange>( () => _collection.RemoveRange( null ) );
+            }
+
+            [Test]
+            [TestCase( new[] { 0, 1, 2, 3 }, new[] { 0, 1, 2, 3 } )]
+            [TestCase( new[] { 0, 1, 2, 3 }, new[] { 1, 2, 3 }, 0 )]
+            [TestCase( new[] { 0, 1, 2, 3 }, new[] { 0, 2, 3 }, 1 )]
+            [TestCase( new[] { 0, 1, 2, 3 }, new[] { 2, 3 }, 0, 1 )]
+            [TestCase( new[] { 0, 1, 2, 3 }, new int[] { }, 0, 1, 2, 3 )]
+            [TestCase( new[] { 0, 1 }, new[] { 0, 1 }, 2, 3 )]
+            [TestCase( new[] { 0, 0, 1, 1, 3, 3, 3, 2 }, new[] { 0, 1, 1, 3, 3 }, 0, 3, 2 )]
+            public void RemoveRange_ShouldRemoveRange( int[] toAddIndices, int[] whatLeftIndices,
+                params int[] toRemoveIndices )
+            {
+                var range = new[] { new TestEntity(), new TestEntity(), new TestEntity(), new TestEntity(), };
+                var toAddItems = toAddIndices.Select( index => range[index] ).ToArray();
+                var toRemoveItems = toRemoveIndices.Select( index => range[index] ).ToList();
+                var whatLeftItems = whatLeftIndices.Select( index => range[index] ).ToList();
+                AddRange( toAddItems );
+
+                _collection.RemoveRange( toRemoveItems );
+
+                for ( var i = 0; i < whatLeftItems.Count; i++ )
+                    AreEqual( whatLeftItems[i], _collection[i] );
+            }
+
+            #endregion
+
             private class ObservableRangeCollectionSpy : ObservableRangeCollection<TestEntity>
             {
                 public List<TestEntity> ToAddItems { get; private set; }
@@ -219,73 +248,81 @@ namespace UnitTests
                 _eventNotifier.Reset();
             }
 
-            private void AssertAnEventRaised()
+            private void AssertThatEventWasRaised()
             {
-                True( _eventNotifier.WaitOne( 1500 ) );
+                True( _eventNotifier.WaitOne( 1500 ), "No event was raised!" );
             }
 
-            private void AssertNoEventRaised()
+            private void AssertThatNoEventsWereRaised()
             {
-                False( _eventNotifier.WaitOne( 1500 ) );
+                False( _eventNotifier.WaitOne( 1500 ), "An event was raised!" );
             }
 
             [TestFixture]
             public class ObservableRangeCollectionChangedEventsTest : ObservableRangeCollectionEventContext
             {
+                private const string EVENT_RAISED_BEFORE_OPERATION_IS_DONE = "Event was raised before operation is " +
+                                                                             "done.";
+
                 private NotifyCollectionChangedEventArgs _eventArgs;
-                private int _collectionCountWhenEventRaised;
+                private int _collectionSizeAtEventRaise;
 
                 [SetUp]
                 public void ObservableRangeCollectionEventsTestSetup()
                 {
                     _eventArgs = null;
-                    _collectionCountWhenEventRaised = 0;
-                    _collection.CollectionChanged += OnCollectionChanged();
+                    _collectionSizeAtEventRaise = 0;
+                }
 
-                    NotifyCollectionChangedEventHandler OnCollectionChanged()
+                private NotifyCollectionChangedEventHandler OnCollectionChanged()
+                {
+                    return ( sender, args ) =>
                     {
-                        return ( sender, args ) =>
-                        {
-                            _collectionCountWhenEventRaised = _collection.Count;
-                            _eventArgs = args;
-                            _eventNotifier.Set();
-                        };
-                    }
+                        _collectionSizeAtEventRaise = _collection.Count;
+                        _eventArgs = args;
+                        _eventNotifier.Set();
+                    };
                 }
 
-                private void AssertCollectionChangedEventActionIs(
-                    NotifyCollectionChangedAction collectionChangedAction )
+                private void AssertThatChangeEventActionIs( NotifyCollectionChangedAction changeAction )
                 {
-                    AreEqual( collectionChangedAction, _eventArgs.Action );
+                    AreEqual( changeAction, _eventArgs.Action );
                 }
 
-                [Test]
-                public void WhenAddingRangeOneToEmptyCollection_ShouldRaiseCollectionChangedWithResetAction()
+                private void AssertThatEventWasRaisedAfterOperationIsDone()
                 {
-                    var one = new[] { new TestEntity() };
-
-                    AddAndRaiseEvents( one );
-
-                    AssertAnEventRaised();
-                    AssertCollectionChangedEventActionIs( Reset );
-                    AssertCollectionSizeIs( _collectionCountWhenEventRaised );
+                    That( _collection.Count,
+                        Is.EqualTo( _collectionSizeAtEventRaise ),
+                        EVENT_RAISED_BEFORE_OPERATION_IS_DONE );
                 }
 
                 [Test]
-                public void WhenAddingRangeOneToNonEmptyCollection_ShouldRaiseCollectionChangedWithAddAction()
+                public void WhenAddingRangeToEmptyCollection_ShouldRaiseCollectionChangedWithResetAction()
                 {
+                    _collection.CollectionChanged += OnCollectionChanged();
                     AddAndRaiseEvents( new TestEntity(), new TestEntity() );
-                    var one = new[] { new TestEntity() };
 
-                    AddAndRaiseEvents( one );
+                    AssertThatEventWasRaised();
+                    AssertThatChangeEventActionIs( Reset );
+                    AssertThatEventWasRaisedAfterOperationIsDone();
+                }
 
-                    AssertAnEventRaised();
-                    AssertCollectionChangedEventActionIs( Add );
-                    AssertCollectionSizeIs( _collectionCountWhenEventRaised );
+                [Test]
+                public void WhenAddingRangeToNonEmptyCollection_ShouldRaiseCollectionChangedWithAddAction()
+                {
+                    _collection.CollectionChanged += OnCollectionChanged();
+                    AddAndRaiseEvents( new TestEntity(), new TestEntity() );
+                    var range = new[] { new TestEntity(), new TestEntity() };
+
+                    AddAndRaiseEvents( range );
+
+                    AssertThatEventWasRaised();
+                    AssertThatChangeEventActionIs( Add );
+                    AssertThatEventWasRaisedAfterOperationIsDone();
                     IsNull( _eventArgs.OldItems );
                     AreEqual( 2, _eventArgs.NewStartingIndex );
-                    for ( var i = 0; i < one.Length; i++ )
-                        AreEqual( one[i], _eventArgs.NewItems[i] );
+                    for ( var i = 0; i < range.Length; i++ )
+                        AreEqual( range[i], _eventArgs.NewItems[i] );
                 }
 
                 [Test]
@@ -293,7 +330,7 @@ namespace UnitTests
                 {
                     AddAndRaiseEvents();
 
-                    AssertNoEventRaised();
+                    AssertThatNoEventsWereRaised();
                 }
 
                 [Test]
@@ -309,21 +346,22 @@ namespace UnitTests
 
                     AddAndRaiseEvents( new TestEntity(), new TestEntity(), new TestEntity() );
 
-                    AssertAnEventRaised();
+                    AssertThatEventWasRaised();
                     AreEqual( 1, eventRaisesCount );
                 }
 
                 [Test]
                 public void WhenCollectionChangedHasMultiSubsAndIsBeingModified_AddRangeThrowsInvalidOperation()
                 {
-                    _collection.CollectionChanged += OnCollectionChanged;
+                    _collection.CollectionChanged += OnCollectionChanged();
+                    _collection.CollectionChanged += CollectionChanged;
                     _collection.CollectionChanged += ( sender, args ) => { };
 
                     AddRange( new TestEntity(), new TestEntity(), new TestEntity() );
 
-                    void OnCollectionChanged( object sender, NotifyCollectionChangedEventArgs args )
+                    void CollectionChanged( object sender, NotifyCollectionChangedEventArgs args )
                     {
-                        _collection.CollectionChanged -= OnCollectionChanged;
+                        _collection.CollectionChanged -= CollectionChanged;
 
                         Throws<InvalidOperationException>( () => AddRange( new TestEntity() ) );
                     }
@@ -332,14 +370,15 @@ namespace UnitTests
                 [Test]
                 public void WhenCollectionChangedHasMultiSubsAndIsBeingModified_ReplaceRangeThrowsInvalidOperation()
                 {
-                    _collection.CollectionChanged += OnCollectionChanged;
+                    _collection.CollectionChanged += OnCollectionChanged();
+                    _collection.CollectionChanged += CollectionChanged;
                     _collection.CollectionChanged += ( sender, args ) => { };
 
                     ReplaceRange( new TestEntity(), new TestEntity(), new TestEntity() );
 
-                    void OnCollectionChanged( object sender, NotifyCollectionChangedEventArgs args )
+                    void CollectionChanged( object sender, NotifyCollectionChangedEventArgs args )
                     {
-                        _collection.CollectionChanged -= OnCollectionChanged;
+                        _collection.CollectionChanged -= CollectionChanged;
 
                         Throws<InvalidOperationException>( () => ReplaceRange( new TestEntity() ) );
                     }
@@ -348,17 +387,63 @@ namespace UnitTests
                 [Test]
                 public void WhenCollectionChangedHasMultiSubsAndIsBeingModified_ReplaceThrowsInvalidOperation()
                 {
-                    _collection.CollectionChanged += OnCollectionChanged;
+                    _collection.CollectionChanged += OnCollectionChanged();
+                    _collection.CollectionChanged += CollectionChanged;
                     _collection.CollectionChanged += ( sender, args ) => { };
 
                     _collection.Replace( new TestEntity() );
 
-                    void OnCollectionChanged( object sender, NotifyCollectionChangedEventArgs args )
+                    void CollectionChanged( object sender, NotifyCollectionChangedEventArgs args )
                     {
-                        _collection.CollectionChanged -= OnCollectionChanged;
+                        _collection.CollectionChanged -= CollectionChanged;
 
                         Throws<InvalidOperationException>( () => _collection.Replace( new TestEntity() ) );
                     }
+                }
+
+                [Test]
+                public void WhenItemsRemoved_RemoveRangeShouldRaiseOnlyOneCollectionChangedEvent()
+                {
+                    var eventsRaisedCount = 0;
+                    var entity1 = new TestEntity();
+                    var entity2 = new TestEntity();
+                    var toRemove = new[] { entity1, entity2 };
+                    AddRange( entity1, entity2, new TestEntity() );
+                    _collection.CollectionChanged += ( sender, args ) =>
+                    {
+                        ++eventsRaisedCount;
+                        _eventNotifier.Set();
+                    };
+
+                    _collection.RemoveRange( toRemove );
+
+                    AssertThatEventWasRaised();
+                    That( eventsRaisedCount, Is.EqualTo( 1 ) );
+                }
+
+                [Test]
+                public void WhenItemsRemoved_RemoveRangeShouldRaiseCollectionChangedWithResetAction()
+                {
+                    var entity = new TestEntity();
+                    var toRemove = new[] { entity };
+                    AddRange( entity, new TestEntity(), new TestEntity() );
+                    _collection.CollectionChanged += OnCollectionChanged();
+
+                    _collection.RemoveRange( toRemove );
+
+                    AssertThatEventWasRaised();
+                    AssertThatChangeEventActionIs( Reset );
+                    AssertThatEventWasRaisedAfterOperationIsDone();
+                }
+
+                [Test]
+                public void WhenRangeIsEmpty_RemoveRangeShouldNotRaiseAnyEvents()
+                {
+                    _collection.CollectionChanged += OnCollectionChanged();
+
+                    _collection.RemoveRange( new List<TestEntity>() );
+
+                    AssertThatNoEventsWereRaised();
                 }
             }
 
@@ -383,7 +468,7 @@ namespace UnitTests
                 {
                     AddAndRaiseEvents( new TestEntity() );
 
-                    AssertAnEventRaised();
+                    AssertThatEventWasRaised();
                     AreEqual( 2, _propertiesNames.Count );
                     AreEqual( "Count", _propertiesNames[0] );
                     AreEqual( "Items", _propertiesNames[1] );
@@ -394,7 +479,7 @@ namespace UnitTests
                 {
                     AddAndRaiseEvents();
 
-                    AssertNoEventRaised();
+                    AssertThatNoEventsWereRaised();
                 }
             }
         }
