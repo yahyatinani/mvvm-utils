@@ -48,13 +48,6 @@ namespace UnitTests
                 _collectionSpy = new ObservableRangeCollectionSpy();
             }
 
-            private void AssertCollectionContains( TestEntity entity )
-            {
-                if ( entity == null ) throw new ArgumentNullException( nameof( entity ) );
-
-                True( _collection.Contains( entity ) );
-            }
-
             #region AddAndRaiseEventsTests
 
             [Test]
@@ -68,11 +61,11 @@ namespace UnitTests
             [Test]
             public void WhenRangeOneIsAdded_CollectionShouldContainRangeOne()
             {
-                var one = new[] { new TestEntity() };
+                var rangeOne = new[] { new TestEntity() };
 
-                AddAndRaiseEvents( one );
+                AddAndRaiseEvents( rangeOne );
 
-                foreach ( var entity in one ) AssertCollectionContains( entity );
+                foreach ( var entity in rangeOne ) That( _collection, Does.Contain( entity ) );
             }
 
             [Test]
@@ -85,8 +78,8 @@ namespace UnitTests
                 AddAndRaiseEvents( rangeTwo );
 
                 That( _collection.Count, Is.EqualTo( 3 ) );
-                foreach ( var entity in rangeOne ) AssertCollectionContains( entity );
-                foreach ( var entity in rangeTwo ) AssertCollectionContains( entity );
+                foreach ( var entity in rangeOne ) That( _collection, Does.Contain( entity ) );
+                foreach ( var entity in rangeTwo ) That( _collection, Does.Contain( entity ) );
             }
 
             #endregion
@@ -121,8 +114,8 @@ namespace UnitTests
 
                 _collectionSpy.ReplaceItems( rangeTwo );
 
-                False( _collectionSpy.Contains( rangeOne ) );
-                True( _collectionSpy.IsAddAndRaiseEventsCalled );
+                That( _collectionSpy, Does.Not.Contain( rangeOne ) );
+                That( _collectionSpy.IsAddAndRaiseEventsCalled, Is.True );
                 AreEqual( rangeTwo, _collectionSpy.ToAddItems );
                 AreEqual( 0, _collectionSpy.CountMock, "Clear() got called after AddAndRaiseEvents()!" );
             }
@@ -132,11 +125,11 @@ namespace UnitTests
             [Test]
             public void WhenRangeIsNull_ReplaceRangeShouldThrowNullRangeWithoutChangingCollection()
             {
-                var oldRange = new TestEntity();
-                _collection.Add( oldRange );
+                var range = new[] { new TestEntity(), new TestEntity(), new TestEntity() };
+                AddRange( range );
 
                 Throws<NullRange>( () => ReplaceRange( null ) );
-                AreEqual( oldRange, _collection[0] );
+                for ( var i = 0; i < _collection.Count; i++ ) That( _collection[i], Is.EqualTo( range[i] ) );
             }
 
             [Test]
@@ -157,11 +150,12 @@ namespace UnitTests
             [Test]
             public void WhenItemIsNull_ReplaceThrowNullItem()
             {
-                var oldRange = new TestEntity();
-                _collection.Add( oldRange );
+                var range = new[] { new TestEntity(), new TestEntity(), new TestEntity() };
+                AddRange( range );
+
 
                 Throws<NullItem>( () => _collection.Replace( null ) );
-                AreEqual( oldRange, _collection[0] );
+                for ( var i = 0; i < _collection.Count; i++ ) That( _collection[i], Is.EqualTo( range[i] ) );
             }
 
             [Test]
@@ -171,8 +165,8 @@ namespace UnitTests
 
                 _collectionSpy.Replace( item );
 
-                True( _collectionSpy.IsReplaceItemsCalled );
-                AreEqual( item, _collectionSpy.ReplacedItem );
+                That( _collectionSpy.IsReplaceItemsCalled, Is.True );
+                That( _collectionSpy.ReplacedItem, Is.EqualTo( item ) );
             }
 
             #endregion
