@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo( "UnitTests" )]
@@ -42,8 +43,9 @@ namespace ObservableRangeCollection
 
         public void RemoveRange( IEnumerable<T> range )
         {
+            CheckReentrancy();
             var toRemoveRange = ToList( range );
-            if ( IsEmpty( toRemoveRange ) ) return;
+            if ( AreCollectionOrRangeEmpty( toRemoveRange ) ) return;
 
             foreach ( var item in toRemoveRange ) Items.Remove( item );
 
@@ -74,7 +76,59 @@ namespace ObservableRangeCollection
             OnCollectionChanged( eventArgs );
         }
 
+        public void RemoveRangeWithRemove( IEnumerable<T> range )
+        {
+            CheckReentrancy();
+            var toRemoveRange = ToList( range );
+            if ( AreCollectionOrRangeEmpty( toRemoveRange ) ) return;
+
+            var indices = new List<int>();
+            for ( var i = 0; i < toRemoveRange.Count; i++ )
+            {
+                var index = Items.IndexOf( toRemoveRange[i] );
+                if ( index < 0 )
+                {
+                    toRemoveRange.RemoveAt( i-- );
+                    continue;
+                }
+
+                indices.Add( index );
+            }
+
+            for ( var i = 0; i < indices.Count; i++ ) Items.RemoveAt( indices[i] - i );
+
+            RaiseEvents( RemoveEventArgs( toRemoveRange, DetermineStartingIndex( indices ) ) );
+        }
+
+        private static NotifyCollectionChangedEventArgs RemoveEventArgs( IList toRemoveRange, int startingIndex )
+        {
+            return new NotifyCollectionChangedEventArgs( NotifyCollectionChangedAction.Remove, toRemoveRange,
+                startingIndex );
+        }
+
+        private bool AreCollectionOrRangeEmpty( ICollection toRemoveRange )
+        {
+            return IsEmpty( toRemoveRange ) || IsEmpty();
+        }
+
+        private static int DetermineStartingIndex( List<int> indices )
+        {
+            return IsConsecutive( indices ) ? indices[0] : -1;
+        }
+
+        private static bool IsConsecutive( List<int> indices )
+        {
+            indices.Sort();
+
+            return !indices.Select( ( i, j ) => i - j ).Distinct().Skip( 1 ).Any() && !IsEmpty( indices );
+        }
+
         protected internal abstract void ReplaceItems( List<T> items );
+
+        protected bool IsEmpty()
+        {
+            return Count == 0;
+        }
 
         protected internal abstract void AddAndRaiseEvents( List<T> toAddItems );
 
@@ -104,11 +158,6 @@ namespace ObservableRangeCollection
             foreach ( var item in toAddItems ) Items.Add( item );
 
             RaiseEvents( eventArgs );
-        }
-
-        private bool IsEmpty()
-        {
-            return Count == 0;
         }
 
         private NotifyCollectionChangedEventArgs AddEventArgs( IList toAddItems )
