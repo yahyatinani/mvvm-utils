@@ -209,7 +209,7 @@ namespace UnitTests
             [Test]
             public void WhenRemovingNullRange_RemoveRangeWithRemoveThrowsNullRange()
             {
-                Throws<NullRange>( () => _collection.RemoveRangeWithRemove( null ) );
+                Throws<NullRange>( () => _collection.RemoveRangeWithRemoveAction( null ) );
             }
 
             [Test]
@@ -229,7 +229,7 @@ namespace UnitTests
                 var whatLeftItems = whatLeftIndices.Select( index => range[index] ).ToList();
                 AddRange( toAddItems );
 
-                _collection.RemoveRangeWithRemove( toRemoveItems );
+                _collection.RemoveRangeWithRemoveAction( toRemoveItems );
 
                 for ( var i = 0; i < whatLeftItems.Count; i++ )
                     AreEqual( whatLeftItems[i], _collection[i] );
@@ -503,7 +503,7 @@ namespace UnitTests
                         _eventNotifier.Set();
                     };
 
-                    _collection.RemoveRangeWithRemove( toRemove );
+                    _collection.RemoveRangeWithRemoveAction( toRemove );
 
                     AssertThatEventWasRaised();
                     That( eventsRaisedCount, Is.EqualTo( 1 ) );
@@ -525,7 +525,7 @@ namespace UnitTests
                     AddRange( toAddItems );
                     _collection.CollectionChanged += OnCollectionChanged();
 
-                    _collection.RemoveRangeWithRemove( toRemoveItems );
+                    _collection.RemoveRangeWithRemoveAction( toRemoveItems );
                     var removed = _eventArgs.OldItems;
 
                     AssertThatEventWasRaised();
@@ -540,7 +540,7 @@ namespace UnitTests
                 {
                     _collection.CollectionChanged += OnCollectionChanged();
 
-                    _collection.RemoveRangeWithRemove( new List<TestEntity>() );
+                    _collection.RemoveRangeWithRemoveAction( new List<TestEntity>() );
 
                     AssertThatNoEventsWereRaised();
                 }
@@ -550,7 +550,7 @@ namespace UnitTests
                 {
                     _collection.CollectionChanged += OnCollectionChanged();
 
-                    _collection.RemoveRangeWithRemove( new List<TestEntity> { new TestEntity() } );
+                    _collection.RemoveRangeWithRemoveAction( new List<TestEntity> { new TestEntity() } );
 
                     AssertThatNoEventsWereRaised();
                 }
@@ -572,7 +572,7 @@ namespace UnitTests
                     AddRange( range );
                     _collection.CollectionChanged += OnCollectionChanged();
 
-                    _collection.RemoveRangeWithRemove( toRemoveItems );
+                    _collection.RemoveRangeWithRemoveAction( toRemoveItems );
                     var startingIndex = _eventArgs.OldStartingIndex;
 
                     AssertThatEventWasRaised();
@@ -595,7 +595,7 @@ namespace UnitTests
                     AddRange( toAddItems );
                     _collection.CollectionChanged += OnCollectionChanged();
 
-                    _collection.RemoveRangeWithRemove( toRemoveItems );
+                    _collection.RemoveRangeWithRemoveAction( toRemoveItems );
                     var startingIndex = _eventArgs.OldStartingIndex;
 
                     AssertThatEventWasRaised();
@@ -630,13 +630,13 @@ namespace UnitTests
                     _collection.CollectionChanged += ( sender, args ) => { };
 
                     AddRange( range );
-                    _collection.RemoveRangeWithRemove( range );
+                    _collection.RemoveRangeWithRemoveAction( range );
 
                     void CollectionChanged( object sender, NotifyCollectionChangedEventArgs args )
                     {
                         _collection.CollectionChanged -= CollectionChanged;
 
-                        Throws<InvalidOperationException>( () => _collection.RemoveRangeWithRemove( range ) );
+                        Throws<InvalidOperationException>( () => _collection.RemoveRangeWithRemoveAction( range ) );
                     }
                 }
             }
@@ -720,7 +720,7 @@ namespace UnitTests
                     AddRange( entity, new TestEntity(), new TestEntity() );
                     SubscribeToPropertyChangedEvent();
 
-                    _collection.RemoveRangeWithRemove( toRemove );
+                    _collection.RemoveRangeWithRemoveAction( toRemove );
 
                     AssertThatEventWasRaised();
                     AreEqual( 2, _propertiesNames.Count );
@@ -733,7 +733,7 @@ namespace UnitTests
                 {
                     SubscribeToPropertyChangedEvent();
 
-                    _collection.RemoveRangeWithRemove( new[] { new TestEntity(), new TestEntity() } );
+                    _collection.RemoveRangeWithRemoveAction( new[] { new TestEntity(), new TestEntity() } );
 
                     AssertThatNoEventsWereRaised();
                 }

@@ -61,7 +61,7 @@ namespace MvvmUtils
             return new NotifyCollectionChangedEventArgs( RESET_ACTION );
         }
 
-        public void RemoveRangeWithRemove( IEnumerable<T> range )
+        public void RemoveRangeWithRemoveAction( IEnumerable<T> range )
         {
             CheckReentrancy();
 
