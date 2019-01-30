@@ -9,6 +9,10 @@
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 
         <RootNamespace>UnitTests</RootNamespace>
+
+        <Title>MvvmUtils Unit Tests</Title>
+
+        <Authors>Yahya Tinani</Authors>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|AnyCPU'">
