@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Authors>why?</Authors>
+        <AssemblyName>MvvmUtils</AssemblyName>
+        <RootNamespace>MvvmUtils</RootNamespace>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <TargetFrameworks>net461;netstandard1.0;netcoreapp2.0</TargetFrameworks>
+        <PackageVersion>1.0.0.0</PackageVersion>
+        <Title>MvvmUtils</Title>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    </ItemGroup>
+
+</Project>
