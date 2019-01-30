@@ -7,9 +7,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo( "UnitTests" )]
+[assembly: InternalsVisibleTo( "MvvmUtils.UnitTests" )]
 
-namespace ObservableRangeCollection
+namespace MvvmUtils
 {
     public abstract class ObservableRangeCollectionBase<T> : ObservableCollection<T>
     {

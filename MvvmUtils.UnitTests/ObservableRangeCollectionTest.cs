@@ -5,10 +5,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using ObservableRangeCollection;
+using MvvmUtils;
 using static System.Collections.Specialized.NotifyCollectionChangedAction;
 using static NUnit.Framework.Assert;
-using static ObservableRangeCollection.ObservableRangeCollectionBase<UnitTests.TestEntity>;
+using static MvvmUtils.ObservableRangeCollectionBase<UnitTests.TestEntity>;
 
 namespace UnitTests
 {
