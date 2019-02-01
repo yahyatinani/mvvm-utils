@@ -15,39 +15,12 @@
           <CodeCoverage>
             <!-- Match assembly file paths: -->
             <ModulePaths>
-              <Include>
-                <ModulePath>.*\.dll$</ModulePath>
-                <ModulePath>.*\.exe$</ModulePath>
-              </Include>
               <Exclude>
                 <ModulePath>.*CPPUnitTestFramework.*</ModulePath>
-                <ModulePath>NUnit.Framework.dll</ModulePath>
-                <ModulePath>NUnit3.TestAdapter.dll</ModulePath>
+                <ModulePath>nunit.framework.dll</ModulePath>
+                <ModulePath>nunit3.testadapter.dll</ModulePath>
               </Exclude>
             </ModulePaths>
-
-            <!-- Match attributes on any code element: -->
-            <Attributes>
-              <Exclude>
-                <!-- Don't forget "Attribute" at the end of the name -->
-                <Attribute>^System\.Diagnostics\.DebuggerHiddenAttribute$</Attribute>
-                <Attribute>^System\.Diagnostics\.DebuggerNonUserCodeAttribute$</Attribute>
-                <Attribute>^System\.Runtime\.CompilerServices.CompilerGeneratedAttribute$</Attribute>
-                <Attribute>^System\.CodeDom\.Compiler.GeneratedCodeAttribute$</Attribute>
-                <Attribute>^System\.Diagnostics\.CodeAnalysis.ExcludeFromCodeCoverageAttribute$</Attribute>
-              </Exclude>
-            </Attributes>
-
-            <!-- Match the path of the source files in which each method is defined: -->
-            <Sources>
-              <Exclude>
-                <Source>.*\\atlmfc\\.*</Source>
-                <Source>.*\\vctools\\.*</Source>
-                <Source>.*\\public\\sdk\\.*</Source>
-                <Source>.*\\microsoft sdks\\.*</Source>
-                <Source>.*\\vc\\include\\.*</Source>
-              </Exclude>
-            </Sources>
 
             <!-- We recommend you do not change the following values: -->
             <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>
