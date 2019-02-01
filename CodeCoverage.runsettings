@@ -16,8 +16,6 @@
             <!-- Match assembly file paths: -->
             <ModulePaths>
               <Exclude>
-                <ModulePath>.*CPPUnitTestFramework.*</ModulePath>
-                <ModulePath>nunit.framework.dll</ModulePath>
                 <ModulePath>nunit3.testadapter.dll</ModulePath>
               </Exclude>
             </ModulePaths>
