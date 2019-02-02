@@ -14,10 +14,7 @@
   
     <!-- Framework35 | [Framework40] | Framework45 -->  
     <TargetFrameworkVersion>.NETCoreApp,Version=v2.0</TargetFrameworkVersion>
-    <TargetFrameworkVersion>.NETFramework,Version=v4.6.1</TargetFrameworkVersion>  
-  
-    <!-- Path to Test Adapters -->  
-    <TestAdaptersPaths>%SystemDrive%\Temp\foo;%SystemDrive%\Temp\bar</TestAdaptersPaths>  
+    <TargetFrameworkVersion>.NETFramework,Version=v4.6.1</TargetFrameworkVersion>
   </RunConfiguration>  
   
   <DataCollectionRunSettings>
@@ -32,13 +29,6 @@
         <Configuration>
           <CodeCoverage>
             <!-- Match assembly file paths: -->
-            <ModulePaths>
-              <Exclude>
-               <ModulePath>NUnit.Framework.dll</ModulePath>
-               <ModulePath>NUnit3.TestAdapter.dll</ModulePath>
-              </Exclude>
-            </ModulePaths>
-
             <!-- We recommend you do not change the following values: -->
             <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>
             <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>
