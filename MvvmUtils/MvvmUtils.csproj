@@ -17,6 +17,7 @@
         <PackageTags>mvvm, view model, observable collection, xamarin, net core, net standard, pcl, xamarin, android, ios, uwp, windows phone, .net</PackageTags>
         <RepositoryType>git</RepositoryType>
         <PackageReleaseNotes>https://github.com/whyrising/mvvm-utils/blob/master/CHANGELOG.md </PackageReleaseNotes>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
