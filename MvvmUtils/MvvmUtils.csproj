@@ -5,7 +5,7 @@
         <AssemblyName>MvvmUtils</AssemblyName>
         <RootNamespace>MvvmUtils</RootNamespace>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <TargetFrameworks>net461;netstandard1.0;netcoreapp2.0</TargetFrameworks>
+        <TargetFrameworks>net45;net46;netstandard1.0;netstandard2.0;netcoreapp2.0</TargetFrameworks>
         <PackageVersion>1.0.0</PackageVersion>
         <Title>Mvvm Utils</Title>
         <Description>Utilities to save you some time when using MVVM pattern</Description>
