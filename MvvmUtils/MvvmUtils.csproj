@@ -5,10 +5,9 @@
         <AssemblyName>MvvmUtils</AssemblyName>
         <RootNamespace>MvvmUtils</RootNamespace>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <TargetFrameworks>net45;net46;netstandard1.0;netstandard2.0;netcoreapp2.0</TargetFrameworks>
         <PackageVersion>1.0.0</PackageVersion>
         <Title>Mvvm Utils</Title>
-        <Description>Utilities to save you some time when using MVVM pattern</Description>
+        <Description>Utilities to save you some time when using MVVM pattern.</Description>
         <Copyright>2019 Yahya Tinani</Copyright>
         <PackageProjectUrl>https://github.com/whyrising/mvvm-utils</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -20,6 +19,7 @@
         <RepositoryType>git</RepositoryType>
         <PackageReleaseNotes>https://github.com/whyrising/mvvm-utils/blob/master/CHANGELOG.md</PackageReleaseNotes>
         <IsPackable>true</IsPackable>
+        <TargetFramework>netstandard1.1</TargetFramework>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
