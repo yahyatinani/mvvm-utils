@@ -7,7 +7,7 @@
         <owners>Yahya Tinani</owners>
         <projectUrl>https://github.com/whyrising/mvvm-utils</projectUrl>
         <license type="expression">MIT</license>
-        <iconUrl>https://github.com/whyrising/mvvm-utils/blob/master/img/icon.png</iconUrl>
+        <iconUrl>https://raw.githubusercontent.com/whyrising/mvvm-utils/master/img/icon.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <releaseNotes>https://github.com/whyrising/mvvm-utils/blob/master/CHANGELOG.md</releaseNotes>
         <description>Utilities to save you some time when using MVVM pattern.</description>
