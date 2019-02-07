@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+    <metadata>
+        <id>MvvmUtils</id>
+        <version>$version$</version>
+        <authors>Yahya Tinani</authors>
+        <owners>Yahya Tinani</owners>
+        <projectUrl>https://github.com/whyrising/mvvm-utils</projectUrl>
+        <license type="expression">MIT</license>
+        <iconUrl>https://raw.githubusercontent.com/whyrising/mvvm-utils/master/img/icon.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <releaseNotes>https://github.com/whyrising/mvvm-utils/blob/master/CHANGELOG.md</releaseNotes>
+        <description>Utilities to save you some time when using MVVM pattern.</description>
+        <copyright>Copyright �2019 Yahya Tinani</copyright>
+        <tags>
+            mvvm, view model, observable collection, xamarin, net core, net standard, pcl, xamarin, android, ios, uwp,
+            windows phone, .net
+        </tags>
+        <dependencies>
+            <group targetFramework="netstandard1.1">
+                <dependency id="NETStandard.Library" version="1.6.1" />
+            </group>
+        </dependencies>
+    </metadata>
+</package>
