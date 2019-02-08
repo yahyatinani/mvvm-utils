@@ -11,7 +11,7 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <releaseNotes>https://github.com/whyrising/mvvm-utils/blob/master/CHANGELOG.md</releaseNotes>
         <description>Utilities to save you some time when using MVVM pattern.</description>
-        <copyright>Copyright �2019 Yahya Tinani</copyright>
+        <copyright>Copyright 2019 Yahya Tinani</copyright>
         <tags>
             mvvm, view model, observable collection, xamarin, net core, net standard, pcl, xamarin, android, ios, uwp,
             windows phone, .net
