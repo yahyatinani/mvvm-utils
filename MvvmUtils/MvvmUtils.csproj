@@ -5,14 +5,14 @@
         <AssemblyName>MvvmUtils</AssemblyName>
         <RootNamespace>MvvmUtils</RootNamespace>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>1.0.0</PackageVersion>
+        <PackageVersion>1.0.1</PackageVersion>
         <Title>Mvvm Utils</Title>
         <Description>Utilities to save you some time when using MVVM pattern.</Description>
-        <Copyright>2019 Yahya Tinani</Copyright>
+        <Copyright>© 2019 Yahya Tinani</Copyright>
         <PackageProjectUrl>https://github.com/whyrising/mvvm-utils</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/whyrising/mvvm-utils</RepositoryUrl>
-        <PackageIconUrl>https://github.com/whyrising/mvvm-utils/blob/master/img/icon.png</PackageIconUrl>
+        <PackageIconUrl>https://raw.githubusercontent.com/whyrising/mvvm-utils/master/img/icon.png</PackageIconUrl>
         <PackageTags>
             mvvm, view model, observable collection, xamarin, net core, net standard, pcl, xamarin, android, ios, uwp, windows phone, .net
         </PackageTags>
