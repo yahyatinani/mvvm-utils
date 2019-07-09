@@ -560,8 +560,8 @@ namespace UnitTests
                 [TestCase( 1, 1 )]
                 [TestCase( 2, 3, 2, 5, 4 )]
                 [TestCase( 1, 1, 2, 3 )]
-                public void WhenRemovingConsecutiveRange_ShouldRaiseRemoveActionWithFirstIndex( int expectedIndex,
-                    params int[] toRemoveIndices )
+                public void WhenRemovingConsecutiveRange_ShouldRaiseRemoveActionWithFirstIndex(
+                    int expectedIndex, params int[] toRemoveIndices )
                 {
                     var range = new[]
                     {

@@ -49,7 +49,7 @@ namespace MvvmUtils
             CheckReentrancy();
 
             var toRemoveRange = ToList( range );
-            if ( AreCollectionOrRangeEmpty( toRemoveRange ) ) return;
+            if ( IsCollectionOrRangeEmpty( toRemoveRange ) ) return;
 
             foreach ( var item in toRemoveRange ) Items.Remove( item );
 
@@ -66,9 +66,9 @@ namespace MvvmUtils
             CheckReentrancy();
 
             var toRemoveRange = ToList( range );
-            if ( AreCollectionOrRangeEmpty( toRemoveRange ) ) return;
+            if ( IsCollectionOrRangeEmpty( toRemoveRange ) ) return;
 
-            var indices = GetIndicesOfExitingItemsAndExcludeThatDoesNot( toRemoveRange );
+            var indices = GetOnlyIndicesOfExitingItems( toRemoveRange );
 
             for ( var i = 0; i < indices.Count; i++ ) Items.RemoveAt( indices[i] - i );
 
@@ -82,7 +82,7 @@ namespace MvvmUtils
             return range is List<T> list ? list : new List<T>( range );
         }
 
-        private bool AreCollectionOrRangeEmpty( ICollection toRemoveRange )
+        private bool IsCollectionOrRangeEmpty( ICollection toRemoveRange )
         {
             return IsEmpty( toRemoveRange ) || IsEmpty();
         }
@@ -97,7 +97,7 @@ namespace MvvmUtils
             return Count == 0;
         }
 
-        private List<int> GetIndicesOfExitingItemsAndExcludeThatDoesNot( IList<T> toRemoveRange )
+        private List<int> GetOnlyIndicesOfExitingItems( IList<T> toRemoveRange )
         {
             var indices = new List<int>();
             for ( var i = 0; i < toRemoveRange.Count; i++ )
