@@ -68,7 +68,7 @@ namespace MvvmUtils
             var toRemoveRange = ToList( range );
             if ( IsCollectionOrRangeEmpty( toRemoveRange ) ) return;
 
-            var indices = GetOnlyIndicesOfExitingItems( toRemoveRange );
+            var indices = GetOnlyIndicesOfExistingItems( toRemoveRange );
 
             for ( var i = 0; i < indices.Count; i++ ) Items.RemoveAt( indices[i] - i );
 
@@ -97,7 +97,7 @@ namespace MvvmUtils
             return Count == 0;
         }
 
-        private List<int> GetOnlyIndicesOfExitingItems( IList<T> toRemoveRange )
+        private List<int> GetOnlyIndicesOfExistingItems( IList<T> toRemoveRange )
         {
             var indices = new List<int>();
             for ( var i = 0; i < toRemoveRange.Count; i++ )
