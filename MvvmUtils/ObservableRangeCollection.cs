@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo( "MvvmUtils.UnitTests" )]
@@ -70,6 +69,8 @@ namespace MvvmUtils
 
             var indices = GetOnlyIndicesOfExistingItems( toRemoveRange );
 
+            if ( IsEmpty( indices ) ) return;
+
             for ( var i = 0; i < indices.Count; i++ ) Items.RemoveAt( indices[i] - i );
 
             RaiseEvents( RemoveEventArgs( toRemoveRange, DetermineStartingIndex( indices ) ) );
@@ -115,14 +116,7 @@ namespace MvvmUtils
 
         private static int DetermineStartingIndex( List<int> indices )
         {
-            return IsConsecutive( indices ) ? indices[0] : -1;
-        }
-
-        private static bool IsConsecutive( List<int> numbers )
-        {
-            numbers.Sort();
-
-            return !numbers.Select( ( i, j ) => i - j ).Distinct().Skip( 1 ).Any() && !IsEmpty( numbers );
+            return Utilities.IsConsecutive( indices ) ? indices[0] : -1;
         }
 
         private static NotifyCollectionChangedEventArgs RemoveEventArgs( IList toRemoveRange, int startingIndex )

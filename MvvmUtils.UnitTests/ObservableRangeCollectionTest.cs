@@ -489,6 +489,8 @@ namespace UnitTests
 
                 #endregion
 
+                #region RemoveRangeWithRemove
+
                 [Test]
                 public void WhenItemsRemoved_RemoveRangeWithRemoveShouldRaiseOnlyOneCollectionChangedEvent()
                 {
@@ -513,10 +515,8 @@ namespace UnitTests
                 [TestCase( new[] { 0, 1, 2, 3 }, new[] { 0 }, 0 )]
                 [TestCase( new[] { 0, 1, 2, 3 }, new[] { 0, 2, 3 }, 0, 2, 3 )]
                 [TestCase( new[] { 0, 1, 2 }, new[] { 0, 2 }, 0, 2, 3 )]
-                [TestCase( new[] { 0 }, new int[] { }, 1, 2, 3 )]
-                [TestCase( new[] { 0 }, new int[] { }, 1 )]
-                public void RemoveRangeWithRemove_ShouldRaiseRemoveActionWithRemovedItems( int[] toAddIndices,
-                    int[] removedItemsIndices, params int[] toRemoveIndices )
+                public void RemoveRangeWithRemove_ShouldRaiseRemoveActionWithRemovedItems(
+                    int[] toAddIndices, int[] removedItemsIndices, params int[] toRemoveIndices )
                 {
                     var range = new[] { new TestEntity(), new TestEntity(), new TestEntity(), new TestEntity() };
                     var toAddItems = toAddIndices.Select( index => range[index] ).ToArray();
@@ -533,6 +533,30 @@ namespace UnitTests
                     AssertThatEventWasRaisedAfterOperationIsDone();
                     for ( var i = 0; i < removed.Count; i++ )
                         That( expectedRemovedItems[i], Is.EqualTo( removed[i] ) );
+                }
+
+                [Test]
+                [TestCase( 0, 0 )]
+                [TestCase( 1, 1 )]
+                [TestCase( 2, 3, 2, 5, 4 )]
+                [TestCase( 1, 1, 2, 3 )]
+                public void WhenRemovingConsecutiveRange_ShouldRaiseRemoveActionWithStartingIndex(
+                    int expectedStartingIndex, params int[] toRemoveIndices )
+                {
+                    var range = new[]
+                    {
+                        new TestEntity(), new TestEntity(), new TestEntity(), new TestEntity(), new TestEntity(),
+                        new TestEntity(),
+                    };
+                    var toRemoveItems = toRemoveIndices.Select( index => range[index] ).ToList();
+                    AddRange( range );
+                    _collection.CollectionChanged += OnCollectionChanged();
+
+                    _collection.RemoveRangeWithRemoveAction( toRemoveItems );
+                    var startingIndex = _eventArgs.OldStartingIndex;
+
+                    AssertThatEventWasRaised();
+                    That( startingIndex, Is.EqualTo( expectedStartingIndex ) );
                 }
 
                 [Test]
@@ -556,50 +580,50 @@ namespace UnitTests
                 }
 
                 [Test]
-                [TestCase( 0, 0 )]
-                [TestCase( 1, 1 )]
-                [TestCase( 2, 3, 2, 5, 4 )]
-                [TestCase( 1, 1, 2, 3 )]
-                public void WhenRemovingConsecutiveRange_ShouldRaiseRemoveActionWithFirstIndex(
-                    int expectedIndex, params int[] toRemoveIndices )
+                public void WhenRemovingNoneExistingRange_RemoveRangeWithRemoveShouldNotRaiseAnyEvents()
                 {
-                    var range = new[]
-                    {
-                        new TestEntity(), new TestEntity(), new TestEntity(), new TestEntity(), new TestEntity(),
-                        new TestEntity(),
-                    };
-                    var toRemoveItems = toRemoveIndices.Select( index => range[index] ).ToList();
-                    AddRange( range );
+                    _collection.AddRange( new List<TestEntity> { new TestEntity(), new TestEntity() } );
                     _collection.CollectionChanged += OnCollectionChanged();
 
-                    _collection.RemoveRangeWithRemoveAction( toRemoveItems );
-                    var startingIndex = _eventArgs.OldStartingIndex;
+                    _collection.RemoveRangeWithRemoveAction( new List<TestEntity> { new TestEntity() } );
 
-                    AssertThatEventWasRaised();
-                    That( startingIndex, Is.EqualTo( expectedIndex ) );
+                    AssertThatNoEventsWereRaised();
                 }
 
                 [Test]
-                [TestCase( new[] { 0 }, 1, 5, 4 )]
-                [TestCase( new[] { 0, 1, 2, 3, 4, 5 }, 1, 5, 4 )]
-                public void WhenRemovingNonConsecutiveOrExistingRange_ShouldRaiseRemoveActionWithMinusOneIndex(
-                    int[] toAddIndices, params int[] toRemoveIndices )
+                public void WhenRemovingNoneConsecutive_ShouldRaiseRemoveActionWithMinusOneIndex()
                 {
-                    var range = new[]
-                    {
-                        new TestEntity(), new TestEntity(), new TestEntity(), new TestEntity(), new TestEntity(),
-                        new TestEntity(),
-                    };
-                    var toRemoveItems = toRemoveIndices.Select( index => range[index] ).ToList();
-                    var toAddItems = toAddIndices.Select( index => range[index] ).ToArray();
-                    AddRange( toAddItems );
+                    var entity1 = new TestEntity();
+                    var entity2 = new TestEntity();
+                    var entity3 = new TestEntity();
+                    var entity4 = new TestEntity();
+                    var entity5 = new TestEntity();
+                    var entity6 = new TestEntity();
+                    AddRange( entity1, entity2, entity3, entity4, entity5, entity6 );
                     _collection.CollectionChanged += OnCollectionChanged();
 
-                    _collection.RemoveRangeWithRemoveAction( toRemoveItems );
-                    var startingIndex = _eventArgs.OldStartingIndex;
+                    _collection.RemoveRangeWithRemoveAction( new[] { entity1, entity5, entity4 } );
 
-                    AssertThatEventWasRaised();
-                    That( startingIndex, Is.EqualTo( -1 ) );
+                    That( _eventArgs.OldStartingIndex, Is.EqualTo( -1 ) );
+                }
+
+                [Test]
+                [Ignore( "" )]
+                public void WhenRemovingNoneDistinctConsecutiveRange()
+                {
+                    var entity1 = new TestEntity();
+                    var entity2 = new TestEntity();
+                    var entity3 = new TestEntity();
+                    var entity4 = new TestEntity();
+                    var entity5 = new TestEntity();
+                    var entity6 = new TestEntity();
+                    AddRange( entity1, entity2, entity3, entity4, entity5, entity6 );
+                    _collection.CollectionChanged += OnCollectionChanged();
+
+                    _collection.RemoveRangeWithRemoveAction( new[] { entity1, entity1, entity2 } );
+
+                    //That( _eventArgs.OldStartingIndex, Is.EqualTo( -1 ) );
+                    Fail();
                 }
 
                 [Test]
@@ -639,6 +663,8 @@ namespace UnitTests
                         Throws<InvalidOperationException>( () => _collection.RemoveRangeWithRemoveAction( range ) );
                     }
                 }
+
+                #endregion
             }
 
             [TestFixture]
