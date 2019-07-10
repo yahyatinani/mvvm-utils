@@ -7,7 +7,10 @@ namespace MvvmUtils
     {
         internal static bool IsConsecutive( List<int> numbers )
         {
-            return numbers.Last() - numbers[0] == numbers.Count - 1;
+            numbers.Sort();
+            var l = numbers.Distinct().ToList();
+
+            return l.Last() - l.First() == l.Count - 1;
         }
     }
 }

@@ -221,6 +221,8 @@ namespace UnitTests
             [TestCase( new[] { 0, 1 }, new[] { 0, 1 }, 2, 3 )]
             [TestCase( new[] { 0, 0, 1, 1, 3, 3, 3, 2 }, new[] { 0, 1, 1, 3, 3 }, 0, 3, 2 )]
             [TestCase( new[] { 0, 1, 2, 3 }, new[] { 3 }, 0, 2, 1 )]
+            [TestCase( new[] { 0, 0, 1, 1, 3, 3, 3, 2 }, new[] { 1, 1, 3, 3 }, 0, 0, 2 )]
+            [TestCase( new[] { 0, 1, 2, 3 }, new[] { 0, 3 }, 1, 1, 2 )]
             public void RemoveRangeWithRemove_ShouldRemoveRange(
                 int[] toAddIndices, int[] whatLeftIndices, params int[] toRemoveIndices )
             {
@@ -574,17 +576,6 @@ namespace UnitTests
                 }
 
                 [Test]
-                public void RemoveRangeWithRemove_ShouldRaiseRemoveActionEvent()
-                {
-                    var entity1 = new TestEntity();
-                    var entity2 = new TestEntity();
-                    var entity3 = new TestEntity();
-                    var entity4 = new TestEntity();
-                    var entity5 = new TestEntity();
-                    var entity6 = new TestEntity();
-                }
-
-                [Test]
                 public void WhenRangeIsEmpty_RemoveRangeWithRemoveShouldNotRaiseAnyEvents()
                 {
                     _collection.CollectionChanged += OnCollectionChanged();
@@ -625,12 +616,15 @@ namespace UnitTests
                     var entity5 = new TestEntity();
                     var entity6 = new TestEntity();
                     AddRange( entity1, entity2, entity3, entity4, entity5, entity6 );
+                    var leftRange = new List<TestEntity> { entity3, entity4, entity5, entity6 };
                     _collection.CollectionChanged += OnCollectionChanged();
 
                     _collection.RemoveRangeWithRemoveAction( new[] { entity1, entity1, entity2 } );
 
-                    //That( _eventArgs.OldStartingIndex, Is.EqualTo( -1 ) );
-                    Fail();
+                    That( _collection.Count, Is.EqualTo( 4 ) );
+                    That( _eventArgs.OldItems.Count, Is.EqualTo( 2 ) );
+                    for ( var i = 0; i < leftRange.Count; i++ )
+                        That( _collection[i], Is.EqualTo( leftRange[i] ) );
                 }
 
                 [Test]
