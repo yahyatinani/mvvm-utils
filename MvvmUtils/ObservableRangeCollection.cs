@@ -67,13 +67,24 @@ namespace MvvmUtils
             var toRemoveRange = ToList( range );
             if ( IsCollectionOrRangeEmpty( toRemoveRange ) ) return;
 
-            var indices = GetOnlyIndicesOfExistingItems( toRemoveRange );
+            var indices = new List<int>();
+
+            for ( var i = 0; i < toRemoveRange.Count; i++ )
+            {
+                var index = Items.IndexOf( toRemoveRange[i] );
+
+                if ( index < 0 )
+                    toRemoveRange.RemoveAt( i-- );
+                else
+                    indices.Add( index );
+            }
 
             if ( IsEmpty( indices ) ) return;
 
-            for ( var i = 0; i < indices.Count; i++ ) Items.RemoveAt( indices[i] - i );
+            indices.Sort();
+            for ( var i = indices.Count - 1; i >= 0; i-- ) Items.RemoveAt( indices[i] );
 
-            RaiseEvents( RemoveEventArgs( toRemoveRange, DetermineStartingIndex( indices ) ) );
+            RaiseEvents( RemoveEventArgs( toRemoveRange, FindStartingIndex( indices ) ) );
         }
 
         private static List<T> ToList( IEnumerable<T> range )
@@ -98,23 +109,7 @@ namespace MvvmUtils
             return Count == 0;
         }
 
-        private List<int> GetOnlyIndicesOfExistingItems( IList<T> toRemoveRange )
-        {
-            var indices = new List<int>();
-            for ( var i = 0; i < toRemoveRange.Count; i++ )
-            {
-                var index = Items.IndexOf( toRemoveRange[i] );
-
-                if ( index < 0 )
-                    toRemoveRange.RemoveAt( i-- );
-                else
-                    indices.Add( index );
-            }
-
-            return indices;
-        }
-
-        private static int DetermineStartingIndex( List<int> indices )
+        private static int FindStartingIndex( List<int> indices )
         {
             return Utilities.IsConsecutive( indices ) ? indices[0] : -1;
         }
