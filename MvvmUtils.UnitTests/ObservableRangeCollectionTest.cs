@@ -526,13 +526,14 @@ namespace UnitTests
                     _collection.CollectionChanged += OnCollectionChanged();
 
                     _collection.RemoveRangeWithRemoveAction( toRemoveItems );
-                    var removed = _eventArgs.OldItems;
+                    var removedItems = _eventArgs.OldItems;
 
                     AssertThatEventWasRaised();
                     AssertThatChangeEventActionIs( Remove );
                     AssertThatEventWasRaisedAfterOperationIsDone();
-                    for ( var i = 0; i < removed.Count; i++ )
-                        That( expectedRemovedItems[i], Is.EqualTo( removed[i] ) );
+                    That( removedItems.Count, Is.EqualTo( expectedRemovedItems.Count ) );
+                    for ( var i = 0; i < expectedRemovedItems.Count; i++ )
+                        That( expectedRemovedItems[i], Is.EqualTo( removedItems[i] ) );
                 }
 
                 [Test]
