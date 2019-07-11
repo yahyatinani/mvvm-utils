@@ -157,18 +157,6 @@ namespace UnitTests
                 Throws<NullItem>( () => _collection.Replace( null ) );
                 for ( var i = 0; i < _collection.Count; i++ ) That( _collection[i], Is.EqualTo( range[i] ) );
             }
-
-            [Test]
-            public void ReplaceShouldCallReplaceItems()
-            {
-                var item = new TestEntity();
-
-                _collectionSpy.Replace( item );
-
-                That( _collectionSpy.IsReplaceItemsCalled, Is.True );
-                That( _collectionSpy.ReplacedItem, Is.EqualTo( item ) );
-            }
-
             #endregion
 
             #region RemoveRange

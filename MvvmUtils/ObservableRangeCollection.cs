@@ -17,16 +17,10 @@ namespace MvvmUtils
 
         public void Replace( T item )
         {
-            CheckReentrancy();
-
-            ReplaceItems( WrapItem( item ) );
-        }
-
-        private static List<T> WrapItem( T item )
-        {
             if ( item == null ) throw new NullItem();
 
-            return new List<T> { item };
+            Items.Clear();
+            Add( item );
         }
 
         public void ReplaceRange( IEnumerable<T> range )
