@@ -93,14 +93,14 @@ namespace MvvmUtils
             return range is List<T> list ? list : new List<T>( range );
         }
 
-        private bool IsCollectionOrRangeEmpty( ICollection toRemoveRange )
+        private bool IsCollectionOrRangeEmpty( ICollection range )
         {
-            return IsEmpty( toRemoveRange ) || IsEmpty();
+            return IsEmpty( range ) || IsEmpty();
         }
 
-        protected static bool IsEmpty( ICollection toAddItems )
+        protected static bool IsEmpty( ICollection collection )
         {
-            return toAddItems.Count == 0;
+            return collection.Count == 0;
         }
 
         protected bool IsEmpty()
