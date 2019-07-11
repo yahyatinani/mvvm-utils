@@ -14,6 +14,7 @@ namespace MvvmUtils
     {
         private const NotifyCollectionChangedAction RESET_ACTION = NotifyCollectionChangedAction.Reset;
         private const NotifyCollectionChangedAction REMOVE_ACTION = NotifyCollectionChangedAction.Remove;
+        protected const NotifyCollectionChangedAction ADD_ACTION = NotifyCollectionChangedAction.Add;
 
         public void Replace( T item )
         {
@@ -137,8 +138,6 @@ namespace MvvmUtils
 
     public class ObservableRangeCollection<T> : ObservableRangeCollectionBase<T>
     {
-        private const NotifyCollectionChangedAction ADD_ACTION = NotifyCollectionChangedAction.Add;
-
         protected internal override void AddAndRaiseEvents( List<T> toAddItems )
         {
             if ( IsEmpty( toAddItems ) ) return;
