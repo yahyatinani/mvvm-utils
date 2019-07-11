@@ -27,7 +27,9 @@ namespace MvvmUtils
         {
             CheckReentrancy();
 
-            ReplaceItems( ToList( range ) );
+            Items.Clear();
+
+            AddAndRaiseEvents( ToList( range ) );
         }
 
         public void AddRange( IEnumerable<T> range )
@@ -122,8 +124,6 @@ namespace MvvmUtils
             OnCollectionChanged( eventArgs );
         }
 
-        protected internal abstract void ReplaceItems( List<T> items );
-
         protected internal abstract void AddAndRaiseEvents( List<T> toAddItems );
 
         public class NullRange : Exception
@@ -138,13 +138,6 @@ namespace MvvmUtils
     public class ObservableRangeCollection<T> : ObservableRangeCollectionBase<T>
     {
         private const NotifyCollectionChangedAction ADD_ACTION = NotifyCollectionChangedAction.Add;
-
-        protected internal override void ReplaceItems( List<T> items )
-        {
-            Items.Clear();
-
-            AddAndRaiseEvents( items );
-        }
 
         protected internal override void AddAndRaiseEvents( List<T> toAddItems )
         {

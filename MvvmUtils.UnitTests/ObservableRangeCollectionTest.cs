@@ -106,13 +106,13 @@ namespace UnitTests
             #endregion
 
             [Test]
-            public void ReplaceItemsShouldClearRangeOneAndCallAddAndRaiseEventsToAddRangeTwo()
+            public void ReplaceRangeShouldClearRangeOneAndCallAddAndRaiseEventsToAddRangeTwo()
             {
                 var rangeOne = new TestEntity();
                 var rangeTwo = new List<TestEntity> { new TestEntity(), new TestEntity() };
                 _collectionSpy.Add( rangeOne );
 
-                _collectionSpy.ReplaceItems( rangeTwo );
+                _collectionSpy.ReplaceRange( rangeTwo );
 
                 That( _collectionSpy, Does.Not.Contain( rangeOne ) );
                 That( _collectionSpy.IsAddAndRaiseEventsCalled, Is.True );
@@ -132,17 +132,6 @@ namespace UnitTests
                 for ( var i = 0; i < _collection.Count; i++ ) That( _collection[i], Is.EqualTo( range[i] ) );
             }
 
-            [Test]
-            public void ReplaceRangeShouldCallReplaceItems()
-            {
-                var testEntities = new List<TestEntity> { new TestEntity(), new TestEntity() };
-
-                _collectionSpy.ReplaceRange( testEntities );
-
-                True( _collectionSpy.IsReplaceItemsCalled );
-                AreEqual( testEntities, _collectionSpy.ToAddItems );
-            }
-
             #endregion
 
             #region ReplaceTests
@@ -157,6 +146,7 @@ namespace UnitTests
                 Throws<NullItem>( () => _collection.Replace( null ) );
                 for ( var i = 0; i < _collection.Count; i++ ) That( _collection[i], Is.EqualTo( range[i] ) );
             }
+
             #endregion
 
             #region RemoveRange
@@ -241,18 +231,7 @@ namespace UnitTests
                     IsAddAndRaiseEventsCalled = true;
                 }
 
-                protected internal override void ReplaceItems( List<TestEntity> items )
-                {
-                    base.ReplaceItems( items );
-                    IsReplaceItemsCalled = true;
-                    ReplacedItem = items[0];
-                }
-
                 public bool IsAddAndRaiseEventsCalled { get; private set; }
-
-                public bool IsReplaceItemsCalled { get; private set; }
-
-                public TestEntity ReplacedItem { get; private set; }
             }
         }
 
