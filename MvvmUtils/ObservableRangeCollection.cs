@@ -16,6 +16,7 @@ namespace MvvmUtils
         private const NotifyCollectionChangedAction REMOVE_ACTION = NotifyCollectionChangedAction.Remove;
         protected const NotifyCollectionChangedAction ADD_ACTION = NotifyCollectionChangedAction.Add;
 
+        /// <exception cref="NullItem">If the given item is null.</exception>
         public void Replace( T item )
         {
             if ( item == null ) throw new NullItem();
@@ -24,6 +25,7 @@ namespace MvvmUtils
             Add( item );
         }
 
+        /// <exception cref="NullRange">If the given range is null.</exception>
         public void ReplaceRange( IEnumerable<T> range )
         {
             CheckReentrancy();
@@ -33,6 +35,7 @@ namespace MvvmUtils
             AddAndRaiseEvents( ToList( range ) );
         }
 
+        /// <exception cref="NullRange">If the given range is null.</exception>
         public void AddRange( IEnumerable<T> range )
         {
             CheckReentrancy();
@@ -40,6 +43,7 @@ namespace MvvmUtils
             AddAndRaiseEvents( ToList( range ) );
         }
 
+        /// <exception cref="NullRange">If the given range is null.</exception>
         public void RemoveRange( IEnumerable<T> range )
         {
             CheckReentrancy();
@@ -57,6 +61,7 @@ namespace MvvmUtils
             return new NotifyCollectionChangedEventArgs( RESET_ACTION );
         }
 
+        /// <exception cref="NullRange">If the given range is null.</exception>
         public void RemoveRangeWithRemoveAction( IEnumerable<T> range )
         {
             CheckReentrancy();
@@ -85,7 +90,7 @@ namespace MvvmUtils
 
             RaiseEvents( RemoveEventArgs( toRemoveRange, FindStartingIndex( indices ) ) );
         }
-
+        
         private static List<T> ToList( IEnumerable<T> range )
         {
             if ( range == null ) throw new NullRange();
