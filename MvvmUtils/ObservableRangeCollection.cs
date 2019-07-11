@@ -68,19 +68,25 @@ namespace MvvmUtils
             if ( IsCollectionOrRangeEmpty( toRemoveRange ) ) return;
 
             var indices = new List<int>();
-            var removedItems = new List<T>();
-            foreach ( var item in toRemoveRange )
+            for ( var i = 0; i < toRemoveRange.Count; i++ )
             {
+                var item = toRemoveRange[i];
                 var index = Items.IndexOf( item );
-                if ( index < 0 || !Items.Remove( item ) ) continue;
-
-                indices.Add( index );
-                removedItems.Add( item );
+                if ( index < 0 )
+                {
+                    toRemoveRange.Remove( item );
+                    i--;
+                }
+                else
+                {
+                    Items.Remove( item );
+                    indices.Add( index );
+                }
             }
 
             if ( IsEmpty( indices ) ) return;
 
-            RaiseEvents( RemoveEventArgs( removedItems, FindStartingIndex( indices ) ) );
+            RaiseEvents( RemoveEventArgs( toRemoveRange, FindStartingIndex( indices ) ) );
         }
 
         private static List<T> ToList( IEnumerable<T> range )
