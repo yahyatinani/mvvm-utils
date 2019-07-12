@@ -105,6 +105,8 @@ namespace UnitTests
 
             #endregion
 
+            #region ReplaceRangeTests
+
             [Test]
             public void ReplaceRangeShouldClearRangeOneAndCallAddAndRaiseEventsToAddRangeTwo()
             {
@@ -119,8 +121,6 @@ namespace UnitTests
                 AreEqual( rangeTwo, _collectionSpy.ToAddItems );
                 AreEqual( 0, _collectionSpy.CountMock, "Clear() got called after AddAndRaiseEvents()!" );
             }
-
-            #region ReplaceRangeTests
 
             [Test]
             public void WhenRangeIsNull_ReplaceRangeShouldThrowNullRangeWithoutChangingCollection()
@@ -258,8 +258,8 @@ namespace UnitTests
             [TestFixture]
             public class ObservableRangeCollectionChangedEventsTest : ObservableRangeCollectionEventContext
             {
-                private const string EVENT_RAISED_BEFORE_OPERATION_IS_DONE = "Event was raised before operation is " +
-                                                                             "done.";
+                private const string EVENT_RAISED_BEFORE_OPERATION = "Event was raised before operation is " +
+                                                                     "done.";
 
                 private NotifyCollectionChangedEventArgs _eventArgs;
                 private int _collectionSizeAtEventRaise;
@@ -288,10 +288,10 @@ namespace UnitTests
 
                 private void AssertThatEventWasRaisedAfterOperationIsDone()
                 {
-                    That( _collection.Count,
-                        Is.EqualTo( _collectionSizeAtEventRaise ),
-                        EVENT_RAISED_BEFORE_OPERATION_IS_DONE );
+                    That( _collection.Count, Is.EqualTo( _collectionSizeAtEventRaise ), EVENT_RAISED_BEFORE_OPERATION );
                 }
+
+                #region AddAndRaiseEventsTests
 
                 [Test]
                 public void WhenAddingRangeToEmptyCollection_ShouldRaiseCollectionChangedWithResetAction()
@@ -347,6 +347,10 @@ namespace UnitTests
                     AreEqual( 1, eventRaisesCount );
                 }
 
+                #endregion
+
+                #region AddRangeTests
+
                 [Test]
                 public void WhenCollectionChangedHasMultiSubsAndIsBeingModified_AddRangeThrowsInvalidOperation()
                 {
@@ -363,6 +367,10 @@ namespace UnitTests
                         Throws<InvalidOperationException>( () => AddRange( new TestEntity() ) );
                     }
                 }
+
+                #endregion
+
+                #region ReplaceRangeTests
 
                 [Test]
                 public void WhenCollectionChangedHasMultiSubsAndIsBeingModified_ReplaceRangeThrowsInvalidOperation()
@@ -381,6 +389,10 @@ namespace UnitTests
                     }
                 }
 
+                #endregion
+
+                #region ReplaceTests
+
                 [Test]
                 public void WhenCollectionChangedHasMultiSubsAndIsBeingModified_ReplaceThrowsInvalidOperation()
                 {
@@ -397,6 +409,8 @@ namespace UnitTests
                         Throws<InvalidOperationException>( () => _collection.Replace( new TestEntity() ) );
                     }
                 }
+
+                #endregion
 
                 #region RemoveRangeTests
 
@@ -646,6 +660,22 @@ namespace UnitTests
                     _propertiesNames = new List<string>();
                 }
 
+                private void SubscribeToPropertyChangedEvent()
+                {
+                    ( (INotifyPropertyChanged) _collection ).PropertyChanged += OnPropertyChanged();
+
+                    PropertyChangedEventHandler OnPropertyChanged()
+                    {
+                        return ( sender, args ) =>
+                        {
+                            if ( args != null ) _propertiesNames.Add( args.PropertyName );
+                            _eventNotifier.Set();
+                        };
+                    }
+                }
+
+                #region AddAndRaiseEventsTests
+
                 [Test]
                 public void WhenAddingRange_ShouldRaisePropertyChanged()
                 {
@@ -668,6 +698,10 @@ namespace UnitTests
 
                     AssertThatNoEventsWereRaised();
                 }
+
+                #endregion
+
+                #region RemoveRangeTests
 
                 [Test]
                 public void RemoveRange_ShouldRaisePropertyChanged()
@@ -706,6 +740,10 @@ namespace UnitTests
                     AssertThatNoEventsWereRaised();
                 }
 
+                #endregion
+
+                #region RemoveRangeWithRemoveActionTests
+
                 [Test]
                 public void RemoveRangeWithRemove_ShouldRaisePropertyChanged()
                 {
@@ -732,19 +770,7 @@ namespace UnitTests
                     AssertThatNoEventsWereRaised();
                 }
 
-                private void SubscribeToPropertyChangedEvent()
-                {
-                    ( (INotifyPropertyChanged) _collection ).PropertyChanged += OnPropertyChanged();
-
-                    PropertyChangedEventHandler OnPropertyChanged()
-                    {
-                        return ( sender, args ) =>
-                        {
-                            if ( args != null ) _propertiesNames.Add( args.PropertyName );
-                            _eventNotifier.Set();
-                        };
-                    }
-                }
+                #endregion
             }
         }
     }

@@ -21,7 +21,7 @@ namespace MvvmUtils
         {
             if ( item == null ) throw new NullItem();
 
-            Items.Clear();
+            ClearCollection();
             Add( item );
         }
 
@@ -30,9 +30,13 @@ namespace MvvmUtils
         {
             CheckReentrancy();
 
-            Items.Clear();
-
+            ClearCollection();
             AddAndRaiseEvents( ToList( range ) );
+        }
+
+        private void ClearCollection()
+        {
+            Items.Clear();
         }
 
         /// <exception cref="NullRange">If the given range is null.</exception>
@@ -51,7 +55,7 @@ namespace MvvmUtils
             var toRemoveRange = ToList( range );
             if ( IsCollectionOrRangeEmpty( toRemoveRange ) ) return;
 
-            foreach ( var item in toRemoveRange ) Items.Remove( item );
+            foreach ( var item in toRemoveRange ) RemoveItem( item );
 
             RaiseEvents( ResetEventArgs() );
         }
@@ -67,8 +71,6 @@ namespace MvvmUtils
             CheckReentrancy();
 
             var toRemoveRange = ToList( range );
-            if ( IsCollectionOrRangeEmpty( toRemoveRange ) ) return;
-
             var indices = new List<int>();
             for ( var i = 0; i < toRemoveRange.Count; i++ )
             {
@@ -81,7 +83,7 @@ namespace MvvmUtils
                 }
                 else
                 {
-                    Items.Remove( item );
+                    RemoveItem( item );
                     indices.Add( index );
                 }
             }
@@ -90,7 +92,7 @@ namespace MvvmUtils
 
             RaiseEvents( RemoveEventArgs( toRemoveRange, FindStartingIndex( indices ) ) );
         }
-        
+
         private static List<T> ToList( IEnumerable<T> range )
         {
             if ( range == null ) throw new NullRange();
@@ -111,6 +113,11 @@ namespace MvvmUtils
         protected bool IsEmpty()
         {
             return Count == 0;
+        }
+
+        private void RemoveItem( T item )
+        {
+            Items.Remove( item );
         }
 
         private static int FindStartingIndex( List<int> indices )
