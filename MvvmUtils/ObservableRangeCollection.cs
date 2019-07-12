@@ -23,7 +23,7 @@ namespace MvvmUtils
         {
             if ( item == null ) throw new NullItem();
 
-            ClearCollection();
+            ClearWithoutRaisingEvents();
             Add( item );
         }
 
@@ -32,11 +32,11 @@ namespace MvvmUtils
         {
             CheckReentrancy();
 
-            ClearCollection();
+            ClearWithoutRaisingEvents();
             AddAndRaiseEvents( ToList( range ) );
         }
 
-        private void ClearCollection()
+        private void ClearWithoutRaisingEvents()
         {
             Items.Clear();
         }

@@ -402,6 +402,23 @@ namespace UnitTests
                     }
                 }
 
+                [Test]
+                public void ReplaceRange_ShouldOnlyRaiseOneCollectionChangedEvent()
+                {
+                    var eventRaisesCount = 0;
+                    _collection.CollectionChanged += ( sender, args ) =>
+                    {
+                        ++eventRaisesCount;
+
+                        _eventNotifier.Set();
+                    };
+
+                    _collection.ReplaceRange( new[] { new TestEntity() } );
+
+                    AssertThatEventWasRaised();
+                    AreEqual( 1, eventRaisesCount, "More than one CollectionChanged event was raised!" );
+                }
+
                 #endregion
 
                 #region ReplaceTests
@@ -821,6 +838,22 @@ namespace UnitTests
                     SubscribeToPropertyChangedEvent();
 
                     _collection.Replace( entity );
+
+                    AssertThatEventWasRaised();
+                    AreEqual( 2, _propertiesNames.Count, "More than one PropertyChanged event was raised!" );
+                    AreEqual( "Count", _propertiesNames[0] );
+                    AreEqual( "Item[]", _propertiesNames[1] );
+                }
+
+
+                [Test]
+                public void ReplaceRangeShouldRaiseOnePropertyChangedEvent()
+                {
+                    var entity = new TestEntity();
+                    AddRange( new TestEntity(), new TestEntity() );
+                    SubscribeToPropertyChangedEvent();
+
+                    _collection.ReplaceRange( new[] { entity } );
 
                     AssertThatEventWasRaised();
                     AreEqual( 2, _propertiesNames.Count, "More than one PropertyChanged event was raised!" );
