@@ -32,6 +32,8 @@ namespace MvvmUtils
         {
             CheckReentrancy();
 
+            if ( range == null ) throw new NullRange();
+
             ClearWithoutRaisingEvents();
             AddAndRaiseEvents( ToList( range ) );
         }
@@ -46,6 +48,8 @@ namespace MvvmUtils
         {
             CheckReentrancy();
 
+            if ( range == null ) throw new NullRange();
+
             AddAndRaiseEvents( ToList( range ) );
         }
 
@@ -54,9 +58,10 @@ namespace MvvmUtils
         {
             CheckReentrancy();
 
-            var toRemoveRange = ToList( range );
-            if ( IsCollectionOrRangeEmpty( toRemoveRange ) ) return;
+            if ( range == null ) throw new NullRange();
+            if ( IsEmpty() ) return;
 
+            var toRemoveRange = ToList( range );
             var isCollectionChanged = false;
             foreach ( var item in toRemoveRange ) isCollectionChanged = Items.Remove( item );
 
@@ -72,6 +77,7 @@ namespace MvvmUtils
         public void RemoveRangeWithRemoveAction( IEnumerable<T> range )
         {
             CheckReentrancy();
+            if ( range == null ) throw new NullRange();
 
             var toRemoveRange = ToList( range );
             var indices = new List<int>();
@@ -98,14 +104,7 @@ namespace MvvmUtils
 
         private static List<T> ToList( IEnumerable<T> range )
         {
-            if ( range == null ) throw new NullRange();
-
             return range is List<T> list ? list : new List<T>( range );
-        }
-
-        private bool IsCollectionOrRangeEmpty( ICollection range )
-        {
-            return IsEmpty( range ) || IsEmpty();
         }
 
         protected static bool IsEmpty( ICollection collection )
