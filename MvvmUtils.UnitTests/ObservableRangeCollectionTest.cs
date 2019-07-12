@@ -424,7 +424,7 @@ namespace UnitTests
                 }
 
                 [Test]
-                public void WhenAddingRange_ShouldOnlyRaiseOneCollectionChangedEvent22222()
+                public void Replace_ShouldOnlyRaiseOneCollectionChangedEvent()
                 {
                     var eventRaisesCount = 0;
                     _collection.CollectionChanged += ( sender, args ) =>
@@ -716,7 +716,7 @@ namespace UnitTests
                     AssertThatEventWasRaised();
                     AreEqual( 2, _propertiesNames.Count );
                     AreEqual( "Count", _propertiesNames[0] );
-                    AreEqual( "Items", _propertiesNames[1] );
+                    AreEqual( "Item[]", _propertiesNames[1] );
                 }
 
                 [Test]
@@ -746,7 +746,7 @@ namespace UnitTests
                     AssertThatEventWasRaised();
                     AreEqual( 2, _propertiesNames.Count );
                     AreEqual( "Count", _propertiesNames[0] );
-                    AreEqual( "Items", _propertiesNames[1] );
+                    AreEqual( "Item[]", _propertiesNames[1] );
                 }
 
                 [Test]
@@ -798,7 +798,7 @@ namespace UnitTests
                     AssertThatEventWasRaised();
                     AreEqual( 2, _propertiesNames.Count );
                     AreEqual( "Count", _propertiesNames[0] );
-                    AreEqual( "Items", _propertiesNames[1] );
+                    AreEqual( "Item[]", _propertiesNames[1] );
                 }
 
                 [Test]

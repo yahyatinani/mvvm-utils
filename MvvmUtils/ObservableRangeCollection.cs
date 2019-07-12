@@ -12,6 +12,8 @@ namespace MvvmUtils
 {
     public abstract class ObservableRangeCollectionBase<T> : ObservableCollection<T>
     {
+        private const string INDEXER_NAME = "Item[]";
+        private const string COUNT_PROPERTY_NAME = nameof( Count );
         private const NotifyCollectionChangedAction RESET_ACTION = NotifyCollectionChangedAction.Reset;
         private const NotifyCollectionChangedAction REMOVE_ACTION = NotifyCollectionChangedAction.Remove;
         protected const NotifyCollectionChangedAction ADD_ACTION = NotifyCollectionChangedAction.Add;
@@ -128,8 +130,8 @@ namespace MvvmUtils
 
         protected void RaiseEvents( NotifyCollectionChangedEventArgs eventArgs )
         {
-            OnPropertyChanged( new PropertyChangedEventArgs( nameof( Count ) ) );
-            OnPropertyChanged( new PropertyChangedEventArgs( nameof( Items ) ) );
+            OnPropertyChanged( new PropertyChangedEventArgs( COUNT_PROPERTY_NAME ) );
+            OnPropertyChanged( new PropertyChangedEventArgs( INDEXER_NAME ) );
             OnCollectionChanged( eventArgs );
         }
 
