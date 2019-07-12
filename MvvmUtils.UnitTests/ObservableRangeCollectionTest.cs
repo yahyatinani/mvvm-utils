@@ -147,6 +147,19 @@ namespace UnitTests
                 for ( var i = 0; i < _collection.Count; i++ ) That( _collection[i], Is.EqualTo( range[i] ) );
             }
 
+            [Test]
+            public void ReplaceShouldReplaceRangeOneWithItem()
+            {
+                var rangeOne = new[] { new TestEntity(), new TestEntity(), new TestEntity() };
+                var item = new TestEntity();
+                AddRange( rangeOne );
+
+                _collection.Replace( item );
+
+                That( _collection.Count, Is.EqualTo( 1 ) );
+                That( _collection[0], Is.EqualTo( item ) );
+            }
+
             #endregion
 
             #region RemoveRange
@@ -408,6 +421,23 @@ namespace UnitTests
 
                         Throws<InvalidOperationException>( () => _collection.Replace( new TestEntity() ) );
                     }
+                }
+
+                [Test]
+                public void WhenAddingRange_ShouldOnlyRaiseOneCollectionChangedEvent22222()
+                {
+                    var eventRaisesCount = 0;
+                    _collection.CollectionChanged += ( sender, args ) =>
+                    {
+                        ++eventRaisesCount;
+
+                        _eventNotifier.Set();
+                    };
+
+                    _collection.Replace( new TestEntity() );
+
+                    AssertThatEventWasRaised();
+                    AreEqual( 1, eventRaisesCount, "More than one CollectionChanged event was raised!" );
                 }
 
                 #endregion
@@ -782,6 +812,21 @@ namespace UnitTests
                 }
 
                 #endregion
+
+                [Test]
+                public void ReplaceShouldRaiseOnePropertyChangedEvent()
+                {
+                    var entity = new TestEntity();
+                    AddRange( new TestEntity(), new TestEntity() );
+                    SubscribeToPropertyChangedEvent();
+
+                    _collection.Replace( entity );
+
+                    AssertThatEventWasRaised();
+                    AreEqual( 2, _propertiesNames.Count, "More than one PropertyChanged event was raised!" );
+                    AreEqual( "Count", _propertiesNames[0] );
+                    AreEqual( "Item[]", _propertiesNames[1] );
+                }
             }
         }
     }
