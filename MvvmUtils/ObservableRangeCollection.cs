@@ -55,9 +55,10 @@ namespace MvvmUtils
             var toRemoveRange = ToList( range );
             if ( IsCollectionOrRangeEmpty( toRemoveRange ) ) return;
 
-            foreach ( var item in toRemoveRange ) RemoveItem( item );
+            var isCollectionChanged = false;
+            foreach ( var item in toRemoveRange ) isCollectionChanged = Items.Remove( item );
 
-            RaiseEvents( ResetEventArgs() );
+            if ( isCollectionChanged ) RaiseEvents( ResetEventArgs() );
         }
 
         protected static NotifyCollectionChangedEventArgs ResetEventArgs()
@@ -83,7 +84,7 @@ namespace MvvmUtils
                 }
                 else
                 {
-                    RemoveItem( item );
+                    Items.Remove( item );
                     indices.Add( index );
                 }
             }
@@ -113,11 +114,6 @@ namespace MvvmUtils
         protected bool IsEmpty()
         {
             return Count == 0;
-        }
-
-        private void RemoveItem( T item )
-        {
-            Items.Remove( item );
         }
 
         private static int FindStartingIndex( List<int> indices )

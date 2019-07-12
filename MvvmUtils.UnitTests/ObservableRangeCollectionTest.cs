@@ -740,6 +740,17 @@ namespace UnitTests
                     AssertThatNoEventsWereRaised();
                 }
 
+                [Test]
+                public void WhenRangeDoesNotExist_RemoveRangeShouldNotRaiseEvent()
+                {
+                    AddRange( new TestEntity(), new TestEntity(), new TestEntity() );
+                    SubscribeToPropertyChangedEvent();
+
+                    _collection.RemoveRange( new[] { new TestEntity(), new TestEntity() } );
+
+                    AssertThatNoEventsWereRaised();
+                }
+
                 #endregion
 
                 #region RemoveRangeWithRemoveActionTests
