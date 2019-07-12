@@ -136,11 +136,44 @@ namespace MvvmUtils
 
         protected internal abstract void AddAndRaiseEvents( List<T> toAddItems );
 
+        /// <exception cref="NegativeIndex">index is less than 0.</exception>
+        /// <exception cref="NegativeCount">count is less than 0.</exception>
+        /// <exception cref="InvalidIndexCountRange">index and count do not denote a valid range of elements in the
+        /// ObservableRangeCollection&lt;T&gt;.</exception>
+        public List<T> GetRange( int index, int count )
+        {
+            if ( index < 0 )
+                throw new NegativeIndex();
+
+            if ( count < 0 )
+                throw new NegativeCount();
+
+            if ( index + count > Count )
+                throw new InvalidIndexCountRange();
+
+            var requestedRange = new List<T>();
+            for ( var i = index; i < count; i++ ) requestedRange.Add( Items[i] );
+
+            return requestedRange;
+        }
+
         public class NullRange : Exception
         {
         }
 
         public class NullItem : Exception
+        {
+        }
+
+        public class NegativeIndex : Exception
+        {
+        }
+
+        public class InvalidIndexCountRange : Exception
+        {
+        }
+
+        public class NegativeCount : Exception
         {
         }
     }

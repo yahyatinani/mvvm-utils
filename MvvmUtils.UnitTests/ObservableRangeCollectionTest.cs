@@ -48,6 +48,14 @@ namespace UnitTests
                 _collectionSpy = new ObservableRangeCollectionSpy();
             }
 
+            private static void AssertRequestedRangeIs(
+                IReadOnlyList<TestEntity> expectedRange, IReadOnlyList<TestEntity> requestedRange )
+            {
+                That( requestedRange.Count, Is.EqualTo( expectedRange.Count ) );
+                for ( var i = 0; i < expectedRange.Count; i++ )
+                    That( requestedRange[i], Is.EqualTo( expectedRange[i] ) );
+            }
+
             #region AddAndRaiseEventsTests
 
             [Test]
@@ -230,6 +238,40 @@ namespace UnitTests
             }
 
             #endregion
+
+            [Test]
+            public void WhenIndexNegative_GetRangeThrowsNegativeIndex()
+            {
+                Throws<NegativeIndex>( () => _collection.GetRange( -1, 0 ) );
+            }
+
+            [Test]
+            public void WhenCountNegative_GetRangeThrowsNegativeCount()
+            {
+                Throws<NegativeCount>( () => _collection.GetRange( 0, -1 ) );
+            }
+
+            [Test]
+            public void WhenIndexAndCountDoNotDenoteAValidRange_GetRangeThrowsInvalidIndexCountRange()
+            {
+                AddRange( new TestEntity() );
+                Throws<InvalidIndexCountRange>( () => _collection.GetRange( 0, 2 ) );
+            }
+
+            [Test]
+            public void GetRangeShouldReturnRequestedRange()
+            {
+                var entity1 = new TestEntity();
+                var entity2 = new TestEntity();
+                var entity3 = new TestEntity();
+                var entity4 = new TestEntity();
+                var range = new[] { entity1, entity2, entity3, entity4 };
+                AddRange( range );
+
+                AssertRequestedRangeIs( new[] { entity1, entity2 }, _collection.GetRange( 0, 2 ) );
+                AssertRequestedRangeIs( new[] { entity1, entity2, entity3, entity4 }, _collection.GetRange( 0, 4 ) );
+                AssertRequestedRangeIs( new TestEntity[] { }, _collection.GetRange( 0, 0 ) );
+            }
 
             private class ObservableRangeCollectionSpy : ObservableRangeCollection<TestEntity>
             {
