@@ -1,6 +1,6 @@
 # MVVM Utils
 
-[![Build status](https://dev.azure.com/yahyatinani/MVVM%20Utils/_apis/build/status/MVVM%20Utils%20CI)](https://dev.azure.com/yahyatinani/MVVM%20Utils/_build/latest?definitionId=6)![Release status](https://vsrm.dev.azure.com/yahyatinani/_apis/public/Release/badge/d40226bf-0034-4e1e-99a1-f45477642b2b/3/7)[![NuGet](https://img.shields.io/nuget/v/MvvmUtils.svg?label=NuGet)](https://www.nuget.org/packages/MvvmUtils/)![](https://img.shields.io/azure-devops/coverage/yahyatinani/MVVM%20Utils/6.svg)![](https://img.shields.io/nuget/dt/MvvmUtils.svg)![](https://img.shields.io/github/license/whyrising/mvvm-utils.svg)
+[![Build status](https://dev.azure.com/yahya-tinani/mvvm-utils/_apis/build/status/mvvm-utils%20CI)](https://dev.azure.com/yahya-tinani/mvvm-utils/_build/latest?definitionId=1)![Release status](https://vsrm.dev.azure.com/yahya-tinani/_apis/public/Release/badge/f481c3b8-48a1-4acc-8604-db8291e96afa/2/2)[![NuGet](https://img.shields.io/nuget/v/MvvmUtils.svg?label=NuGet)](https://www.nuget.org/packages/MvvmUtils/)![](https://img.shields.io/azure-devops/coverage/yahyatinani/MVVM%20Utils/6.svg)![](https://img.shields.io/nuget/dt/MvvmUtils.svg)![](https://img.shields.io/github/license/whyrising/mvvm-utils.svg)
 
 MVVM Utils is intended to save developers' time by providing a bunch of handy classes that replace some of the repetitive code that we may have to write in a MVVM application.
 
