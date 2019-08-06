@@ -11,7 +11,9 @@ namespace UnitTests
 
         private string Id { get; }
 
+#pragma warning disable 659
         public override bool Equals( object obj )
+#pragma warning restore 659
         {
             if ( ReferenceEquals( this, obj ) ) return true;
 
@@ -21,16 +23,6 @@ namespace UnitTests
         private bool Equals( TestEntity other )
         {
             return string.Equals( Id, other.Id );
-        }
-
-        public override int GetHashCode()
-        {
-            return ( Id != null ? Id.GetHashCode() : 0 );
-        }
-
-        public override string ToString()
-        {
-            return Id;
         }
     }
 }
